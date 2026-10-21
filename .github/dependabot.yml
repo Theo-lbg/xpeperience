@@ -1,14 +1,37 @@
 version: 2
 updates:
+  # Rust : les mises à jour mineures et correctifs arrivent en une seule PR ; les versions majeures restent séparées.
   - package-ecosystem: cargo
     directory: /
     schedule: { interval: weekly }
+    groups:
+      rust-minor-patch:
+        update-types: [minor, patch]
+
   - package-ecosystem: npm
     directory: /web
     schedule: { interval: weekly }
+    groups:
+      npm-minor-patch:
+        update-types: [minor, patch]
+    ignore:
+      # vue-tsc (dernière version) ne fonctionne pas encore avec TypeScript 7 : « tsc » introuvable.
+      # À réexaminer quand vue-tsc le prendra en charge.
+      - dependency-name: typescript
+        update-types: ["version-update:semver-major"]
+
+  # Actions GitHub : correctifs et mineures groupés ; les majeures, une par une (la release n'est pas testée à chaque PR).
   - package-ecosystem: github-actions
     directory: /
     schedule: { interval: weekly }
+    groups:
+      actions-minor-patch:
+        update-types: [minor, patch]
+
   - package-ecosystem: docker
     directory: /
     schedule: { interval: weekly }
+    ignore:
+      # Node reste sur la version à support long terme (22) : changement de version majeure décidé à la main.
+      - dependency-name: node
+        update-types: ["version-update:semver-major"]
