@@ -1,0 +1,12 @@
+[package]
+name = "boond-server"
+description = "Serveur autonome de Boond by XPEHO (développement et mode serveur)"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+
+[dependencies]
+boond-http.workspace = true
+boond-store.workspace = true
+tokio.workspace = true
+tracing-subscriber.workspace = true

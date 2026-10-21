@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Boond by XPEHO — Réglages de l'extension</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body class="options">
+    <main>
+      <h1>Boond by XPEHO — Extension LinkedIn</h1>
+      <p class="muted">Reliez l'extension à votre Boond by XPEHO. Elle ne communique qu'avec l'adresse saisie ci-dessous, jamais avec un autre service.</p>
+      <form id="form" class="form" novalidate>
+        <label class="field">
+          <span>Adresse de l'application</span>
+          <input id="address" type="text" autocomplete="off" />
+          <small class="hint">Application de bureau : <code>http://127.0.0.1:47821</code>. Serveur d'équipe : son adresse en <code>https://</code> (affichée dans Réglages › Extension LinkedIn). Chrome vous demandera d'autoriser l'accès à cette adresse seulement.</small>
+          <small class="err" id="address-err" role="alert"></small>
+        </label>
+        <label class="field">
+          <span>Jeton d'appairage</span>
+          <input id="token" type="password" autocomplete="off" placeholder="bxp_…" />
+          <small class="hint">Créez-le dans Boond by XPEHO › Réglages › Extension LinkedIn.</small>
+          <small class="err" id="token-err" role="alert"></small>
+        </label>
+        <div class="actions">
+          <button class="btn" type="button" id="test">Tester la connexion</button>
+          <button class="btn primary" type="submit">Enregistrer</button>
+        </div>
+        <div id="feedback"></div>
+      </form>
+      <section>
+        <h2>Ce que fait l'extension</h2>
+        <ul>
+          <li>Elle n'agit que lorsque vous cliquez sur « Ajouter à Boond by XPEHO ».</li>
+          <li>Elle lit uniquement les informations déjà affichées sur le profil que vous consultez : prénom, nom, poste, société, localisation.</li>
+          <li>Rien n'est enregistré avant votre validation de l'aperçu.</li>
+          <li>Elle ne parcourt pas LinkedIn, ne collecte pas de profils en masse et ne contourne aucune protection.</li>
+        </ul>
+      </section>
+    </main>
+    <script src="api.js"></script>
+    <script src="options.js"></script>
+  </body>
+</html>

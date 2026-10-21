@@ -1,0 +1,20 @@
+/target
+/dist
+node_modules
+web/dist
+desktop/gen
+.DS_Store
+*.log
+
+# Secrets, données et sauvegardes : ne jamais versionner
+.env
+.env.*
+!.env.example
+*.sqlite3
+*.sqlite3-*
+/sauvegardes
+/backups
+*.pem
+*.key
+# Logo d'origine déposé à la racine (la copie utilisée par l'application est web/public/logo.png)
+/XPEHOLOGOVERT-*.png

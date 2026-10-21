@@ -1,0 +1,14 @@
+[package]
+name = "boond-store"
+description = "Persistance SQLite de Boond by XPEHO"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+
+[dependencies]
+boond-domain.workspace = true
+rusqlite.workspace = true
+serde_json.workspace = true
+thiserror.workspace = true
+chrono.workspace = true
+serde.workspace = true

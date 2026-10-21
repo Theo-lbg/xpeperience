@@ -1,0 +1,25 @@
+[package]
+name = "boond-http"
+description = "API REST et serveur local de Boond by XPEHO"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+
+[dependencies]
+boond-domain.workspace = true
+boond-store.workspace = true
+boond-service.workspace = true
+rusqlite.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+axum.workspace = true
+tokio.workspace = true
+rust-embed.workspace = true
+mime_guess.workspace = true
+urlencoding.workspace = true
+uuid.workspace = true
+dirs.workspace = true
+tracing.workspace = true
+
+[dev-dependencies]
+tower = { version = "0.5", features = ["util"] }

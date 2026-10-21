@@ -1,0 +1,40 @@
+{
+  "manifest_version": 3,
+  "name": "Boond by XPEHO — Ajouter depuis LinkedIn",
+  "short_name": "Boond by XPEHO",
+  "version": "0.2.0",
+  "description": "Ajoutez à Boond by XPEHO le contact du profil LinkedIn que vous consultez, après aperçu et validation.",
+  "action": {
+    "default_title": "Ajouter à Boond by XPEHO",
+    "default_popup": "popup.html",
+    "default_icon": {
+      "16": "icons/16.png",
+      "32": "icons/32.png"
+    }
+  },
+  "options_ui": {
+    "page": "options.html",
+    "open_in_tab": true
+  },
+  "icons": {
+    "16": "icons/16.png",
+    "32": "icons/32.png",
+    "48": "icons/48.png",
+    "128": "icons/128.png"
+  },
+  "permissions": [
+    "activeTab",
+    "scripting",
+    "storage"
+  ],
+  "host_permissions": [
+    "http://127.0.0.1/*",
+    "http://localhost/*"
+  ],
+  "content_security_policy": {
+    "extension_pages": "script-src 'self'; object-src 'self'; base-uri 'none'"
+  },
+  "optional_host_permissions": [
+    "https://*/*"
+  ]
+}

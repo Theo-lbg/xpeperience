@@ -1,0 +1,35 @@
+# Boond by XPEHO — serveur d'équipe.
+#
+#   cp .env.example .env     # puis renseignez BOOND_PUBLIC_URL (et lisez docs/DEPLOY.md)
+#   docker compose up -d
+#   docker compose logs boond   # affiche le code d'installation au premier démarrage
+#
+# Le serveur n'écoute QUE sur 127.0.0.1 de la machine : placez devant lui un proxy HTTPS
+# (Caddy fourni : docker-compose.caddy.yml, ou celui que vous utilisez déjà : Traefik, Nginx…).
+
+name: boond
+
+services:
+  boond:
+    # Image publiée par la release GitHub (remplacez OWNER), ou construite localement avec « docker compose build ».
+    image: ${BOOND_IMAGE:-ghcr.io/owner/boond-by-xpeho:latest}
+    build: .
+    restart: unless-stopped
+    environment:
+      BOOND_PUBLIC_URL: ${BOOND_PUBLIC_URL:?Renseignez BOOND_PUBLIC_URL dans .env (ex. https://boond.exemple.fr)}
+      BOOND_TRUST_PROXY: "1"
+      BOOND_SETUP_CODE: ${BOOND_SETUP_CODE:-}
+      BOOND_ALLOWED_HOSTS: ${BOOND_ALLOWED_HOSTS:-}
+      RUST_LOG: ${RUST_LOG:-info}
+    volumes:
+      - boond-data:/data
+    ports:
+      - "127.0.0.1:${BOOND_HOST_PORT:-8080}:8080"
+    # Durcissement : aucun privilège supplémentaire, système de fichiers en lecture seule sauf /data.
+    read_only: true
+    tmpfs: [/tmp]
+    cap_drop: [ALL]
+    security_opt: ["no-new-privileges:true"]
+
+volumes:
+  boond-data:

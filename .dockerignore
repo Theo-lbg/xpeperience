@@ -1,0 +1,14 @@
+.git
+.github
+.env
+.env.*
+!.env.example
+target
+dist
+node_modules
+web/node_modules
+web/dist
+desktop/gen
+*.sqlite3*
+*.log
+.DS_Store
