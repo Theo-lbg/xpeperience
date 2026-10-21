@@ -104,7 +104,7 @@ jobs:
           (cd extension && zip -r -X "../release/XpePerience-extension-${GITHUB_REF_NAME}.zip" . -x '*.test.mjs')
       - name: Sommes de contrôle
         run: cd release && sha256sum * > SHA256SUMS.txt && cat SHA256SUMS.txt
-      - uses: softprops/action-gh-release@v2
+      - uses: softprops/action-gh-release@v3
         with:
           files: release/*
           generate_release_notes: true
