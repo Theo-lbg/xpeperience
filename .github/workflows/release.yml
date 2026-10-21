@@ -42,7 +42,7 @@ jobs:
           key: ${{ matrix.target }}
       - name: Application et image disque
         run: TARGET=${{ matrix.target }} ./scripts/package-macos.sh
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: dmg-${{ matrix.target }}
           path: dist/*.dmg
