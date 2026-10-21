@@ -1,6 +1,6 @@
-# Déployer Boond by XPEHO pour une équipe (Docker)
+# Déployer XpePerience pour une équipe (Docker)
 
-Deux façons d'utiliser Boond by XPEHO :
+Deux façons d'utiliser XpePerience :
 
 | | Application de bureau | Serveur d'équipe (ce document) |
 |---|---|---|
@@ -21,17 +21,17 @@ exporter les sauvegardes, appliquer les mises à jour. Rien de tout cela n'est s
 
 - Une machine avec Docker et Docker Compose v2.
 - Un nom de domaine (ou un accès privé de type Tailscale) : l'extension LinkedIn et le cookie de session exigent
-  **HTTPS**. Le serveur refuse d'ailleurs de démarrer ouvert au réseau sans `BOOND_PUBLIC_URL`.
+  **HTTPS**. Le serveur refuse d'ailleurs de démarrer ouvert au réseau sans `XPEPERIENCE_PUBLIC_URL`.
 
 ## Mise en route
 
 ```bash
-git clone https://github.com/OWNER/REPO.git boond && cd boond      # ou téléchargez docker-compose.yml, .env.example, deploy/
+git clone https://github.com/Theo-lbg/xpeperience.git xpeperience && cd xpeperience      # ou téléchargez docker-compose.yml, .env.example, deploy/
 cp .env.example .env
-$EDITOR .env          # renseignez BOOND_PUBLIC_URL (https://…) et BOOND_DOMAIN
+$EDITOR .env          # renseignez XPEPERIENCE_PUBLIC_URL (https://…) et XPEPERIENCE_DOMAIN
 docker compose pull   # image publiée par la release (ou : docker compose build)
 docker compose up -d
-docker compose logs boond | grep -i "code d'installation"
+docker compose logs xpeperience | grep -i "code d'installation"
 ```
 
 1. Ouvrez l'adresse publique : l'écran **Bienvenue** demande le *code d'installation* affiché dans les journaux.
@@ -40,7 +40,7 @@ docker compose logs boond | grep -i "code d'installation"
    administrateur au quotidien.
 
 > Le code d'installation évite qu'un inconnu qui trouverait l'adresse avant vous ne crée le compte administrateur.
-> Vous pouvez aussi le fixer vous-même avec `BOOND_SETUP_CODE`.
+> Vous pouvez aussi le fixer vous-même avec `XPEPERIENCE_SETUP_CODE`.
 
 ## HTTPS : trois options
 
@@ -56,7 +56,7 @@ docker compose -f docker-compose.yml -f docker-compose.caddy.yml up -d
 
 ### B. Vous avez déjà un proxy (Traefik, Nginx, Nginx Proxy Manager…)
 
-Faites-le pointer vers `127.0.0.1:8080` (ou joignez-le au réseau Docker et ciblez `boond:8080`) et **transmettez**
+Faites-le pointer vers `127.0.0.1:8080` (ou joignez-le au réseau Docker et ciblez `xpeperience:8080`) et **transmettez**
 l'en-tête `Host` d'origine et `X-Forwarded-For`. Exemple Nginx :
 
 ```nginx
@@ -74,7 +74,7 @@ location / {
 ### C. Sans ouvrir de port : réseau privé
 
 [Tailscale](https://tailscale.com) (`tailscale serve`/HTTPS) ou un tunnel Cloudflare donnent une adresse HTTPS sans
-exposer votre mini PC sur Internet. Renseignez alors cette adresse dans `BOOND_PUBLIC_URL`.
+exposer votre mini PC sur Internet. Renseignez alors cette adresse dans `XPEPERIENCE_PUBLIC_URL`.
 
 Un simple `http://192.168.x.x` sur le réseau local ne convient pas : mots de passe en clair, et l'extension le refuse.
 
@@ -82,16 +82,16 @@ Un simple `http://192.168.x.x` sur le réseau local ne convient pas : mots de pa
 
 | Variable | Rôle |
 |---|---|
-| `BOOND_PUBLIC_URL` | Adresse publique en `https://`. **Obligatoire.** Sécurise le cookie et active HSTS. |
-| `BOOND_TRUST_PROXY` | `1` (défini par le compose) : lit l'adresse réelle du client dans `X-Forwarded-For`. À n'activer que derrière un proxy de confiance. |
-| `BOOND_SETUP_CODE` | Code pour créer le premier administrateur (généré et affiché s'il est vide). |
-| `BOOND_ALLOWED_HOSTS` | Noms d'hôte supplémentaires acceptés, séparés par des virgules. |
-| `BOOND_DOMAIN` | Domaine, pour `docker-compose.caddy.yml` uniquement. |
-| `BOOND_HOST_PORT` | Port local exposé (défaut 8080). |
+| `XPEPERIENCE_PUBLIC_URL` | Adresse publique en `https://`. **Obligatoire.** Sécurise le cookie et active HSTS. |
+| `XPEPERIENCE_TRUST_PROXY` | `1` (défini par le compose) : lit l'adresse réelle du client dans `X-Forwarded-For`. À n'activer que derrière un proxy de confiance. |
+| `XPEPERIENCE_SETUP_CODE` | Code pour créer le premier administrateur (généré et affiché s'il est vide). |
+| `XPEPERIENCE_ALLOWED_HOSTS` | Noms d'hôte supplémentaires acceptés, séparés par des virgules. |
+| `XPEPERIENCE_DOMAIN` | Domaine, pour `docker-compose.caddy.yml` uniquement. |
+| `XPEPERIENCE_HOST_PORT` | Port local exposé (défaut 8080). |
 
 ## Sauvegarde et restauration
 
-Les données vivent dans le volume Docker `boond_boond-data` : base SQLite, documents (CV…), logo.
+Les données vivent dans le volume Docker `xpeperience_xpeperience-data` : base SQLite, documents (CV…), logo.
 
 ```bash
 ./deploy/backup.sh /chemin/vers/sauvegardes      # copie cohérente, sans arrêter le serveur
@@ -103,7 +103,7 @@ Restaurer une sauvegarde :
 
 ```bash
 docker compose down
-docker run --rm -v boond_boond-data:/data -v "$PWD/sauvegardes/boond-AAAAMMJJ-HHMMSS":/backup:ro \
+docker run --rm -v xpeperience_xpeperience-data:/data -v "$PWD/sauvegardes/xpeperience-AAAAMMJJ-HHMMSS":/backup:ro \
   debian:bookworm-slim sh -c 'rm -rf /data/* && cp -a /backup/. /data/ && chown -R 10001:10001 /data'
 docker compose up -d
 ```
@@ -133,9 +133,9 @@ Protections intégrées : voir [SECURITY.md](../SECURITY.md).
 
 | Symptôme | Piste |
 |---|---|
-| Le conteneur redémarre : « BOOND_PUBLIC_URL » | Renseignez l'adresse publique dans `.env`. |
-| « Hôte non autorisé » (421) | Le proxy ne transmet pas l'en-tête `Host` d'origine, ou l'adresse ne correspond pas à `BOOND_PUBLIC_URL`. |
-| Impossible de rester connecté | L'accès se fait en HTTP alors que `BOOND_PUBLIC_URL` est en HTTPS (cookie `Secure`). Utilisez l'adresse HTTPS. |
-| « Trop de tentatives » | 6 échecs de connexion bloquent le compte et l'adresse 15 min. Vérifiez `BOOND_TRUST_PROXY=1` si tout le monde est bloqué en même temps. |
-| Code d'installation perdu | `docker compose logs boond`, ou définissez `BOOND_SETUP_CODE` puis `docker compose up -d`. |
+| Le conteneur redémarre : « XPEPERIENCE_PUBLIC_URL » | Renseignez l'adresse publique dans `.env`. |
+| « Hôte non autorisé » (421) | Le proxy ne transmet pas l'en-tête `Host` d'origine, ou l'adresse ne correspond pas à `XPEPERIENCE_PUBLIC_URL`. |
+| Impossible de rester connecté | L'accès se fait en HTTP alors que `XPEPERIENCE_PUBLIC_URL` est en HTTPS (cookie `Secure`). Utilisez l'adresse HTTPS. |
+| « Trop de tentatives » | 6 échecs de connexion bloquent le compte et l'adresse 15 min. Vérifiez `XPEPERIENCE_TRUST_PROXY=1` si tout le monde est bloqué en même temps. |
+| Code d'installation perdu | `docker compose logs xpeperience`, ou définissez `XPEPERIENCE_SETUP_CODE` puis `docker compose up -d`. |
 | L'extension répond « jeton refusé » | Créez un nouveau jeton dans *Réglages › Extension LinkedIn*. |

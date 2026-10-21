@@ -1,4 +1,4 @@
-// Client de l'API de Boond by XPEHO. L'extension ne parle qu'à l'application locale.
+// Client de l'API de XpePerience. L'extension ne parle qu'à l'application locale.
 
 const DEFAULT_ADDRESS = 'http://127.0.0.1:47821'
 
@@ -54,7 +54,7 @@ async function call(path, { method = 'GET', body, config } = {}) {
       body: body ? JSON.stringify(body) : undefined,
     })
   } catch {
-    throw new ApiError(0, 'Boond by XPEHO ne répond pas. Vérifiez que l’application est ouverte.')
+    throw new ApiError(0, 'XpePerience ne répond pas. Vérifiez que l’application est ouverte.')
   }
   const data = await res.json().catch(() => null)
   if (!res.ok) {

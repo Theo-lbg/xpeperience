@@ -1,9 +1,9 @@
 # Proxy HTTPS minimal : certificat Let's Encrypt automatique et renouvelé.
 # Le domaine doit pointer vers cette machine, ports 80 et 443 ouverts.
-{$BOOND_DOMAIN} {
+{$XPEPERIENCE_DOMAIN} {
 	encode zstd gzip
-	reverse_proxy boond:8080 {
-		# Le serveur lit X-Forwarded-For (BOOND_TRUST_PROXY=1) : Caddy le renseigne avec l'adresse réelle du client.
+	reverse_proxy xpeperience:8080 {
+		# Le serveur lit X-Forwarded-For (XPEPERIENCE_TRUST_PROXY=1) : Caddy le renseigne avec l'adresse réelle du client.
 		header_up X-Forwarded-For {remote_host}
 	}
 	header -Server

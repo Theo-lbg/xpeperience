@@ -249,86 +249,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "boond-desktop"
-version = "0.1.0"
-dependencies = [
- "boond-http",
- "tauri",
- "tauri-build",
- "tokio",
- "urlencoding",
-]
-
-[[package]]
-name = "boond-domain"
-version = "0.1.0"
-dependencies = [
- "chrono",
- "serde",
- "serde_json",
- "thiserror 2.0.21",
-]
-
-[[package]]
-name = "boond-http"
-version = "0.1.0"
-dependencies = [
- "axum",
- "boond-domain",
- "boond-service",
- "boond-store",
- "dirs 5.0.1",
- "mime_guess",
- "rusqlite",
- "rust-embed",
- "serde",
- "serde_json",
- "tokio",
- "tower",
- "tracing",
- "urlencoding",
- "uuid",
-]
-
-[[package]]
-name = "boond-server"
-version = "0.1.0"
-dependencies = [
- "boond-http",
- "boond-store",
- "tokio",
- "tracing-subscriber",
-]
-
-[[package]]
-name = "boond-service"
-version = "0.1.0"
-dependencies = [
- "argon2",
- "base64 0.22.1",
- "boond-domain",
- "boond-store",
- "chrono",
- "rand",
- "rusqlite",
- "serde",
- "serde_json",
- "sha2 0.10.9",
-]
-
-[[package]]
-name = "boond-store"
-version = "0.1.0"
-dependencies = [
- "boond-domain",
- "chrono",
- "rusqlite",
- "serde",
- "serde_json",
- "thiserror 2.0.21",
-]
-
-[[package]]
 name = "brotli"
 version = "9.0.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -4886,6 +4806,86 @@ dependencies = [
  "libc",
  "once_cell",
  "pkg-config",
+]
+
+[[package]]
+name = "xpeperience-desktop"
+version = "0.1.0"
+dependencies = [
+ "tauri",
+ "tauri-build",
+ "tokio",
+ "urlencoding",
+ "xpeperience-http",
+]
+
+[[package]]
+name = "xpeperience-domain"
+version = "0.1.0"
+dependencies = [
+ "chrono",
+ "serde",
+ "serde_json",
+ "thiserror 2.0.21",
+]
+
+[[package]]
+name = "xpeperience-http"
+version = "0.1.0"
+dependencies = [
+ "axum",
+ "dirs 5.0.1",
+ "mime_guess",
+ "rusqlite",
+ "rust-embed",
+ "serde",
+ "serde_json",
+ "tokio",
+ "tower",
+ "tracing",
+ "urlencoding",
+ "uuid",
+ "xpeperience-domain",
+ "xpeperience-service",
+ "xpeperience-store",
+]
+
+[[package]]
+name = "xpeperience-server"
+version = "0.1.0"
+dependencies = [
+ "tokio",
+ "tracing-subscriber",
+ "xpeperience-http",
+ "xpeperience-store",
+]
+
+[[package]]
+name = "xpeperience-service"
+version = "0.1.0"
+dependencies = [
+ "argon2",
+ "base64 0.22.1",
+ "chrono",
+ "rand",
+ "rusqlite",
+ "serde",
+ "serde_json",
+ "sha2 0.10.9",
+ "xpeperience-domain",
+ "xpeperience-store",
+]
+
+[[package]]
+name = "xpeperience-store"
+version = "0.1.0"
+dependencies = [
+ "chrono",
+ "rusqlite",
+ "serde",
+ "serde_json",
+ "thiserror 2.0.21",
+ "xpeperience-domain",
 ]
 
 [[package]]

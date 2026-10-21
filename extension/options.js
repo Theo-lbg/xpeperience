@@ -24,8 +24,8 @@ function read() {
     $('address-err').textContent = 'Adresse invalide : http://127.0.0.1:47821 (application de bureau) ou https://votre-serveur.'
     ok = false
   }
-  if (!token.startsWith('bxp_')) {
-    $('token-err').textContent = 'Collez le jeton créé dans Boond by XPEHO (il commence par bxp_).'
+  if (!/^(xpe|bxp)_/.test(token)) {
+    $('token-err').textContent = 'Collez le jeton créé dans XpePerience (il commence par xpe_ ou bxp_).'
     ok = false
   }
   return ok ? { address, token } : null

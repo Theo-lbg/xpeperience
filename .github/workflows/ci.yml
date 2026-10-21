@@ -33,10 +33,10 @@ jobs:
       - uses: Swatinem/rust-cache@v2
 
       - name: Tests Rust
-        run: cargo test --workspace --exclude boond-desktop --locked
+        run: cargo test --workspace --exclude xpeperience-desktop --locked
 
       - name: Clippy
-        run: cargo clippy --workspace --exclude boond-desktop --all-targets --locked
+        run: cargo clippy --workspace --exclude xpeperience-desktop --all-targets --locked
 
       - name: Extension LinkedIn (lecteur de profil)
         run: node extension/reader.test.mjs

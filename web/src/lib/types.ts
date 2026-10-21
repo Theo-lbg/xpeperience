@@ -1,4 +1,4 @@
-// Types alignés sur le modèle Rust (crates/boond-domain/src/model.rs).
+// Types alignés sur le modèle Rust (crates/xpeperience-domain/src/model.rs).
 
 export type Id = number
 export interface Named { id: Id; name: string }

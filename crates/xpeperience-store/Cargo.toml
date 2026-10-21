@@ -1,0 +1,14 @@
+[package]
+name = "xpeperience-store"
+description = "Persistance SQLite de XpePerience"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+
+[dependencies]
+xpeperience-domain.workspace = true
+rusqlite.workspace = true
+serde_json.workspace = true
+thiserror.workspace = true
+chrono.workspace = true
+serde.workspace = true

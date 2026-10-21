@@ -45,14 +45,14 @@ async function submit() {
       <div>
         <h1>{{ setup ? 'Bienvenue' : 'Connexion' }}</h1>
         <p class="muted" style="margin-top: 6px">
-          {{ setup ? 'Créez le compte administrateur pour démarrer Boond by XPEHO.' : `Connectez-vous à ${session.appName}.` }}
+          {{ setup ? 'Créez le compte administrateur pour démarrer XpePerience.' : `Connectez-vous à ${session.appName}.` }}
         </p>
       </div>
       <div v-if="setup" class="form-grid">
         <Field label="Prénom" :error="errors.first_name" for="fn"><input id="fn" v-model="form.first_name" class="input" :class="{ invalid: errors.first_name }" autocomplete="given-name" autofocus /></Field>
         <Field label="Nom" :error="errors.last_name" for="ln"><input id="ln" v-model="form.last_name" class="input" :class="{ invalid: errors.last_name }" autocomplete="family-name" /></Field>
       </div>
-      <Field v-if="setup && session.setupCodeRequired" label="Code d'installation" :error="errors.setup_code" hint="Affiché dans les journaux du serveur au premier démarrage (docker compose logs boond)." for="sc">
+      <Field v-if="setup && session.setupCodeRequired" label="Code d'installation" :error="errors.setup_code" hint="Affiché dans les journaux du serveur au premier démarrage (docker compose logs xpeperience)." for="sc">
         <input id="sc" v-model="form.setup_code" class="input" :class="{ invalid: errors.setup_code }" autocomplete="off" spellcheck="false" autofocus />
       </Field>
       <Field label="Adresse e-mail" :error="errors.email" for="em"><input id="em" v-model="form.email" class="input" :class="{ invalid: errors.email }" type="email" autocomplete="username" :autofocus="!setup" /></Field>

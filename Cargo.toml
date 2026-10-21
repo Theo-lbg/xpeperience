@@ -1,11 +1,11 @@
 [workspace]
 resolver = "2"
 members = [
-    "crates/boond-domain",
-    "crates/boond-store",
-    "crates/boond-service",
-    "crates/boond-http",
-    "crates/boond-server",
+    "crates/xpeperience-domain",
+    "crates/xpeperience-store",
+    "crates/xpeperience-service",
+    "crates/xpeperience-http",
+    "crates/xpeperience-server",
     "desktop",
 ]
 
@@ -16,10 +16,10 @@ authors = ["XPEHO"]
 rust-version = "1.85"
 
 [workspace.dependencies]
-boond-domain = { path = "crates/boond-domain" }
-boond-store = { path = "crates/boond-store" }
-boond-service = { path = "crates/boond-service" }
-boond-http = { path = "crates/boond-http" }
+xpeperience-domain = { path = "crates/xpeperience-domain" }
+xpeperience-store = { path = "crates/xpeperience-store" }
+xpeperience-service = { path = "crates/xpeperience-service" }
+xpeperience-http = { path = "crates/xpeperience-http" }
 
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"

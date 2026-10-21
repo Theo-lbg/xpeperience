@@ -1,5 +1,5 @@
 # syntax=docker/dockerfile:1.7
-# Image du serveur Boond by XPEHO (mode équipe). Aucun secret n'est intégré à l'image :
+# Image du serveur XpePerience (mode équipe). Aucun secret n'est intégré à l'image :
 # tout se configure par variables d'environnement au lancement (voir .env.example).
 
 # ── 1. Interface Vue ────────────────────────────────────────────────────────
@@ -20,19 +20,19 @@ COPY crates crates
 COPY desktop/Cargo.toml desktop/build.rs desktop/
 COPY desktop/src desktop/src
 COPY --from=web /src/web/dist web/dist
-RUN cargo build --release --locked -p boond-server
+RUN cargo build --release --locked -p xpeperience-server
 
 # ── 3. Image finale : minuscule, sans compilateur, utilisateur sans privilèges ──
 FROM debian:bookworm-slim
-RUN useradd --system --uid 10001 --home-dir /data --shell /usr/sbin/nologin boond \
-    && mkdir -p /data && chown boond:boond /data
-COPY --from=build /src/target/release/boond-server /usr/local/bin/boond-server
+RUN useradd --system --uid 10001 --home-dir /data --shell /usr/sbin/nologin xpeperience \
+    && mkdir -p /data && chown xpeperience:xpeperience /data
+COPY --from=build /src/target/release/xpeperience-server /usr/local/bin/xpeperience-server
 
-ENV BOOND_DATA_DIR=/data \
-    BOOND_BIND=0.0.0.0 \
-    BOOND_PORT=8080
-USER boond
+ENV XPEPERIENCE_DATA_DIR=/data \
+    XPEPERIENCE_BIND=0.0.0.0 \
+    XPEPERIENCE_PORT=8080
+USER xpeperience
 VOLUME /data
 EXPOSE 8080
-HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 CMD ["boond-server", "healthcheck"]
-ENTRYPOINT ["boond-server"]
+HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 CMD ["xpeperience-server", "healthcheck"]
+ENTRYPOINT ["xpeperience-server"]

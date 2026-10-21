@@ -95,7 +95,7 @@ jobs:
           path: release
       - name: Extension LinkedIn
         run: |
-          (cd extension && zip -r -X "../release/Boond-by-XPEHO-extension-${GITHUB_REF_NAME}.zip" . -x '*.test.mjs')
+          (cd extension && zip -r -X "../release/XpePerience-extension-${GITHUB_REF_NAME}.zip" . -x '*.test.mjs')
       - name: Sommes de contrôle
         run: cd release && sha256sum * > SHA256SUMS.txt && cat SHA256SUMS.txt
       - uses: softprops/action-gh-release@v2

@@ -1,30 +1,30 @@
-# Boond by XPEHO — serveur d'équipe.
+# XpePerience — serveur d'équipe.
 #
-#   cp .env.example .env     # puis renseignez BOOND_PUBLIC_URL (et lisez docs/DEPLOY.md)
+#   cp .env.example .env     # puis renseignez XPEPERIENCE_PUBLIC_URL (et lisez docs/DEPLOY.md)
 #   docker compose up -d
-#   docker compose logs boond   # affiche le code d'installation au premier démarrage
+#   docker compose logs xpeperience   # affiche le code d'installation au premier démarrage
 #
 # Le serveur n'écoute QUE sur 127.0.0.1 de la machine : placez devant lui un proxy HTTPS
 # (Caddy fourni : docker-compose.caddy.yml, ou celui que vous utilisez déjà : Traefik, Nginx…).
 
-name: boond
+name: xpeperience
 
 services:
-  boond:
-    # Image publiée par la release GitHub (remplacez OWNER), ou construite localement avec « docker compose build ».
-    image: ${BOOND_IMAGE:-ghcr.io/owner/boond-by-xpeho:latest}
+  xpeperience:
+    # Image publiée par la release GitHub , ou construite localement avec « docker compose build ».
+    image: ${XPEPERIENCE_IMAGE:-ghcr.io/theo-lbg/xpeperience:latest}
     build: .
     restart: unless-stopped
     environment:
-      BOOND_PUBLIC_URL: ${BOOND_PUBLIC_URL:?Renseignez BOOND_PUBLIC_URL dans .env (ex. https://boond.exemple.fr)}
-      BOOND_TRUST_PROXY: "1"
-      BOOND_SETUP_CODE: ${BOOND_SETUP_CODE:-}
-      BOOND_ALLOWED_HOSTS: ${BOOND_ALLOWED_HOSTS:-}
+      XPEPERIENCE_PUBLIC_URL: ${XPEPERIENCE_PUBLIC_URL:?Renseignez XPEPERIENCE_PUBLIC_URL dans .env (ex. https://xpeperience.exemple.fr)}
+      XPEPERIENCE_TRUST_PROXY: "1"
+      XPEPERIENCE_SETUP_CODE: ${XPEPERIENCE_SETUP_CODE:-}
+      XPEPERIENCE_ALLOWED_HOSTS: ${XPEPERIENCE_ALLOWED_HOSTS:-}
       RUST_LOG: ${RUST_LOG:-info}
     volumes:
-      - boond-data:/data
+      - xpeperience-data:/data
     ports:
-      - "127.0.0.1:${BOOND_HOST_PORT:-8080}:8080"
+      - "127.0.0.1:${XPEPERIENCE_HOST_PORT:-8080}:8080"
     # Durcissement : aucun privilège supplémentaire, système de fichiers en lecture seule sauf /data.
     read_only: true
     tmpfs: [/tmp]
@@ -32,4 +32,4 @@ services:
     security_opt: ["no-new-privileges:true"]
 
 volumes:
-  boond-data:
+  xpeperience-data:

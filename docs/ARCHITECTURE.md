@@ -1,4 +1,4 @@
-# Boond by XPEHO — architecture
+# XpePerience — architecture
 
 Application de gestion commerciale et de suivi des ressources pour une ESN.
 Développement indépendant : aucune ligne de code de BoondManager n'est reprise.
@@ -17,36 +17,36 @@ Les fonctionnalités s'inspirent seulement de l'analyse de sa documentation publ
 ## Vue d'ensemble
 
 ```
-┌──────────────── Boond by XPEHO.app (Tauri) ────────────────┐
+┌──────────────── XpePerience.app (Tauri) ────────────────┐
 │  Fenêtre native (WebView)  ──HTTP──▶  Serveur local Rust    │
 │  Interface Vue (servie par          (127.0.0.1:47821)       │
 │  le serveur, même origine)            │                     │
 │                                       ▼                     │
-│                         boond-http  (API REST, sessions,    │
+│                         xpeperience-http  (API REST, sessions,    │
 │                                      contrôle d'accès)      │
-│                         boond-service (cas d'usage, règles, │
+│                         xpeperience-service (cas d'usage, règles, │
 │                                      permissions, historique)│
-│                         boond-store  (SQLite, migrations)   │
-│                         boond-domain (modèle, validations,  │
+│                         xpeperience-store  (SQLite, migrations)   │
+│                         xpeperience-domain (modèle, validations,  │
 │                                      matching, dates)       │
 └──────────────────────────────────────────────────────────────┘
         ▲ Bearer (jeton d'appairage)
         │
-Extension « Ajouter à Boond by XPEHO » (service worker MV3)
+Extension « Ajouter à XpePerience » (service worker MV3)
 ```
 
 L'interface et l'extension passent par la même API, donc par les mêmes contrôles de permissions côté serveur.
-Le même serveur peut tourner seul (`boond-server`) pour le développement ou, plus tard, pour une équipe sur un serveur partagé.
+Le même serveur peut tourner seul (`xpeperience-server`) pour le développement ou, plus tard, pour une équipe sur un serveur partagé.
 
 ## Découpage du code
 
 ```
 crates/
-  boond-domain   modèle métier pur : types, validations, permissions, matching, règles de dates
-  boond-store    persistance SQLite : schéma, migrations, requêtes
-  boond-service  cas d'usage : contrôle des droits, validations, transactions, historique
-  boond-http     API REST axum, authentification, protection CSRF/Host, fichiers de l'interface
-  boond-server   binaire autonome (développement, mode serveur)
+  xpeperience-domain   modèle métier pur : types, validations, permissions, matching, règles de dates
+  xpeperience-store    persistance SQLite : schéma, migrations, requêtes
+  xpeperience-service  cas d'usage : contrôle des droits, validations, transactions, historique
+  xpeperience-http     API REST axum, authentification, protection CSRF/Host, fichiers de l'interface
+  xpeperience-server   binaire autonome (développement, mode serveur)
 desktop/         application Tauri : démarre le serveur local et ouvre la fenêtre
 web/             interface Vue
 extension/       extension navigateur LinkedIn
@@ -97,10 +97,10 @@ n'apparaît jamais dans cette liste : il reste toujours facultatif.
 ## Sécurité et données personnelles
 
 - Mots de passe hachés avec Argon2id. Sessions par cookie `HttpOnly`, `SameSite=Strict`.
-- Toute écriture de l'interface exige l'en-tête `X-Boond-Client` : une page web tierce ne peut
+- Toute écriture de l'interface exige l'en-tête `X-Xpeperience-Client` : une page web tierce ne peut
   pas l'envoyer sans pré-vérification CORS, que le serveur refuse.
 - Le serveur vérifie l'en-tête `Host` (protection contre le DNS rebinding).
-- Permissions vérifiées dans `boond-service`, jamais seulement dans l'interface.
+- Permissions vérifiées dans `xpeperience-service`, jamais seulement dans l'interface.
   Les coûts (CJM, contrats RH) forment un domaine de droits séparé : sans droit de lecture,
   l'API ne les renvoie pas.
 - Extension : jeton d'appairage aléatoire, stocké haché, révocable, lié à un utilisateur
@@ -109,7 +109,7 @@ n'apparaît jamais dans cette liste : il reste toujours facultatif.
 
 ## Extension LinkedIn
 
-- Le bouton « Ajouter à Boond by XPEHO » apparaît sur une page de profil ; rien n'est lu
+- Le bouton « Ajouter à XpePerience » apparaît sur une page de profil ; rien n'est lu
   avant le clic.
 - Au clic, l'extension lit uniquement ce qui est affiché à l'écran sur ce profil : prénom, nom,
   poste, société, localisation. Aucune requête vers LinkedIn, aucune navigation, aucun
@@ -120,5 +120,5 @@ n'apparaît jamais dans cette liste : il reste toujours facultatif.
 ## Données de développement
 
 L'application démarre vide (hors listes paramétrables par défaut). Les jeux d'essai utilisés
-pendant le développement vivent dans un dossier de données séparé (`BOOND_DATA_DIR`) et sont
+pendant le développement vivent dans un dossier de données séparé (`XPEPERIENCE_DATA_DIR`) et sont
 explicitement marqués « FICTIF ».

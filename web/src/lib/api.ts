@@ -36,7 +36,7 @@ function query(params?: Record<string, unknown>): string {
 }
 
 async function request<T>(method: string, path: string, body?: unknown, init: RequestInit = {}): Promise<T> {
-  const headers: Record<string, string> = { 'x-boond-client': 'web', ...(init.headers as Record<string, string>) }
+  const headers: Record<string, string> = { 'x-xpeperience-client': 'web', ...(init.headers as Record<string, string>) }
   let payload: BodyInit | undefined
   if (body instanceof Blob || body instanceof ArrayBuffer) payload = body as BodyInit
   else if (body !== undefined) {
@@ -47,7 +47,7 @@ async function request<T>(method: string, path: string, body?: unknown, init: Re
   try {
     res = await fetch(path, { method, headers, body: payload, credentials: 'same-origin' })
   } catch {
-    throw new ApiError(0, 'network', "Impossible de joindre l'application. Relancez Boond by XPEHO.")
+    throw new ApiError(0, 'network', "Impossible de joindre l'application. Relancez XpePerience.")
   }
   if (res.status === 204) return undefined as T
   const text = await res.text()

@@ -31,11 +31,11 @@ async function start() {
 
   if (!cfg.token) {
     return show(
-      notice('info', 'Reliez l’extension à Boond by XPEHO : créez un jeton dans Réglages › Extension LinkedIn.'),
+      notice('info', 'Reliez l’extension à XpePerience : créez un jeton dans Réglages › Extension LinkedIn.'),
       el('button', { class: 'btn primary', onclick: () => chrome.runtime.openOptionsPage() }, 'Configurer l’extension'),
     )
   }
-  show(el('p', { class: 'muted' }, 'Connexion à Boond by XPEHO…'))
+  show(el('p', { class: 'muted' }, 'Connexion à XpePerience…'))
   try {
     status = await call('/api/ext/status', { config: cfg })
   } catch (e) {
@@ -45,7 +45,7 @@ async function start() {
       el('button', { class: 'btn ghost', onclick: () => chrome.runtime.openOptionsPage() }, 'Réglages de l’extension'),
     )
   }
-  if (!status.enabled) return show(notice('warn', 'L’import LinkedIn est désactivé dans les réglages de Boond by XPEHO.'))
+  if (!status.enabled) return show(notice('warn', 'L’import LinkedIn est désactivé dans les réglages de XpePerience.'))
   if (!status.can_import) return show(notice('warn', 'Votre rôle ne permet pas de créer des contacts.'))
   home()
 }
@@ -57,7 +57,7 @@ function home() {
     onProfile
       ? el('p', {}, 'Profil LinkedIn détecté. Les informations visibles seront lues uniquement après votre clic.')
       : notice('info', 'Ouvrez un profil LinkedIn (linkedin.com/in/…) pour préremplir le contact, ou saisissez-le à la main.'),
-    el('button', { class: 'btn primary big', onclick: () => capture(onProfile) }, 'Ajouter à Boond by XPEHO'),
+    el('button', { class: 'btn primary big', onclick: () => capture(onProfile) }, 'Ajouter à XpePerience'),
     !onProfile && el('p', { class: 'hint' }, 'Aucune donnée n’est lue en dehors des profils LinkedIn.'),
   )
 }
@@ -141,7 +141,7 @@ function renderPreview(profile, warning, lookup) {
     duplicateMode = 'update'
     duplicateId = lookup.duplicates[0].id
     dupBox.append(
-      notice('warn', 'Ce contact existe peut-être déjà dans Boond by XPEHO :'),
+      notice('warn', 'Ce contact existe peut-être déjà dans XpePerience :'),
       ...lookup.duplicates.map((d, i) =>
         el(
           'label',
@@ -223,7 +223,7 @@ function renderPreview(profile, warning, lookup) {
 function success(res) {
   const verb = res.status === 'updated' ? 'mis à jour' : 'ajouté'
   show(
-    notice('ok', `${res.contact.name} a été ${verb} dans Boond by XPEHO${res.company ? ` (${res.company.name})` : ''}.`),
+    notice('ok', `${res.contact.name} a été ${verb} dans XpePerience${res.company ? ` (${res.company.name})` : ''}.`),
     el('button', { class: 'btn primary', onclick: () => chrome.tabs.create({ url: res.url }) }, 'Ouvrir la fiche'),
     el('button', { class: 'btn ghost', onclick: home }, 'Ajouter un autre contact'),
   )

@@ -41,10 +41,10 @@ async function logout() {
 
 <template>
   <aside class="sidebar">
-    <RouterLink to="/" class="brand" aria-label="Boond by XPEHO — accueil">
+    <RouterLink to="/" class="brand" aria-label="XpePerience — accueil">
       <img v-if="!logoMissing" :src="logoSrc" alt="XPEHO" class="logo" @error="customLogo ? (customLogo = false) : (logoMissing = true)" />
       <span v-else class="logo-slot">XPEHO</span>
-      <span class="product">Boond <i>by XPEHO</i></span>
+      <span class="product">XpePerience</span>
     </RouterLink>
 
     <nav class="nav" aria-label="Navigation principale">

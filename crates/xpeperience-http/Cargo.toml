@@ -1,0 +1,25 @@
+[package]
+name = "xpeperience-http"
+description = "API REST et serveur local de XpePerience"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+
+[dependencies]
+xpeperience-domain.workspace = true
+xpeperience-store.workspace = true
+xpeperience-service.workspace = true
+rusqlite.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+axum.workspace = true
+tokio.workspace = true
+rust-embed.workspace = true
+mime_guess.workspace = true
+urlencoding.workspace = true
+uuid.workspace = true
+dirs.workspace = true
+tracing.workspace = true
+
+[dev-dependencies]
+tower = { version = "0.5", features = ["util"] }

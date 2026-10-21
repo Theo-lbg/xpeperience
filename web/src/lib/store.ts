@@ -4,7 +4,7 @@ import type { Action, Area, Bootstrap, Id, Named, RefItem, RefListCode } from '.
 
 export const boot = ref<Bootstrap | null>(null)
 
-export const session = reactive({ loaded: false, setupRequired: false, setupCodeRequired: false, authenticated: false, appName: 'Boond by XPEHO' })
+export const session = reactive({ loaded: false, setupRequired: false, setupCodeRequired: false, authenticated: false, appName: 'XpePerience' })
 
 export async function loadSession() {
   const s = await api.get<{ setup_required: boolean; setup_code_required: boolean; authenticated: boolean; app_name: string }>('/api/auth/status')

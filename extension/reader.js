@@ -1,6 +1,6 @@
 // Lecture du profil LinkedIn affiché à l'écran.
 //
-// Cette fonction est injectée UNIQUEMENT quand l'utilisateur clique sur « Ajouter à Boond by XPEHO »
+// Cette fonction est injectée UNIQUEMENT quand l'utilisateur clique sur « Ajouter à XpePerience »
 // (permission activeTab). Elle lit le texte déjà affiché sur la page : aucune requête vers LinkedIn,
 // aucune navigation, aucun défilement, aucun autre profil. Tout champ introuvable reste vide et
 // l'utilisateur le complète à la main dans l'aperçu.

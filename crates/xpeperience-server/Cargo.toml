@@ -1,0 +1,12 @@
+[package]
+name = "xpeperience-server"
+description = "Serveur autonome de XpePerience (développement et mode serveur)"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+
+[dependencies]
+xpeperience-http.workspace = true
+xpeperience-store.workspace = true
+tokio.workspace = true
+tracing-subscriber.workspace = true

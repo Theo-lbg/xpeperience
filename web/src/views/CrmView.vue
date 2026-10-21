@@ -114,7 +114,7 @@ const sectorName = (id: number | null) => refsOf('sector', true).find((s) => s.i
     <div v-else-if="tab === 'contacts'" class="card flush">
       <div v-if="loading && !contacts.length" class="skel"><div v-for="i in 5" :key="i" class="skeleton" style="height: 24px" /></div>
       <EmptyState v-else-if="!contacts.length" icon="users" :title="hasFilters ? 'Aucun contact ne correspond' : 'Aucun contact pour le moment'">
-        {{ hasFilters ? 'Modifiez ou effacez les filtres.' : 'Ajoutez un contact à la main, ou importez-le depuis un profil LinkedIn avec l’extension Boond by XPEHO.' }}
+        {{ hasFilters ? 'Modifiez ou effacez les filtres.' : 'Ajoutez un contact à la main, ou importez-le depuis un profil LinkedIn avec l’extension XpePerience.' }}
         <template v-if="!hasFilters && can('crm', 'create')" #actions><button class="btn primary" type="button" @click="form = 'contact'">Créer un contact</button></template>
       </EmptyState>
       <div v-else class="table-wrap">

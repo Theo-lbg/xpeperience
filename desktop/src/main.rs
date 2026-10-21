@@ -1,4 +1,4 @@
-//! Application de bureau Boond by XPEHO.
+//! Application de bureau XpePerience.
 //!
 //! Une seule fenêtre native affiche l'interface Vue, servie par le serveur Rust embarqué sur
 //! 127.0.0.1. Les données (base SQLite, documents) restent sur l'ordinateur de l'utilisateur.
@@ -10,7 +10,7 @@ use std::net::TcpListener;
 use std::path::PathBuf;
 use std::process::Command;
 
-use boond_http::{DEFAULT_PORT, ServerConfig, build_state, default_data_dir, serve};
+use xpeperience_http::{DEFAULT_PORT, ServerConfig, build_state, default_data_dir, serve};
 use tauri::webview::{DownloadEvent, NewWindowResponse};
 use tauri::{WebviewUrl, WebviewWindowBuilder};
 
@@ -22,7 +22,7 @@ fn bind_local() -> Result<(TcpListener, u16), String> {
         }
     }
     Err(format!(
-        "Les ports {DEFAULT_PORT} à {} sont occupés. Fermez l'autre instance de Boond by XPEHO puis relancez l'application.",
+        "Les ports {DEFAULT_PORT} à {} sont occupés. Fermez l'autre instance de XpePerience puis relancez l'application.",
         DEFAULT_PORT + 19
     ))
 }
@@ -78,7 +78,7 @@ fn start() -> Result<String, String> {
 fn main() {
     tauri::Builder::default()
         .setup(|app| {
-            let (title, w, h) = ("Boond by XPEHO", 1360.0, 880.0);
+            let (title, w, h) = ("XpePerience", 1360.0, 880.0);
             match start() {
                 Ok(origin) => {
                     let local = origin.clone();
@@ -123,5 +123,5 @@ fn main() {
             Ok(())
         })
         .run(tauri::generate_context!())
-        .expect("erreur au lancement de Boond by XPEHO");
+        .expect("erreur au lancement de XpePerience");
 }

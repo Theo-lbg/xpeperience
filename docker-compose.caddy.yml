@@ -2,14 +2,14 @@
 #
 #   docker compose -f docker-compose.yml -f docker-compose.caddy.yml up -d
 #
-# Le domaine (BOOND_DOMAIN) doit pointer vers cette machine, ports 80 et 443 ouverts.
+# Le domaine (XPEPERIENCE_DOMAIN) doit pointer vers cette machine, ports 80 et 443 ouverts.
 services:
   caddy:
     image: caddy:2
     restart: unless-stopped
-    depends_on: [boond]
+    depends_on: [xpeperience]
     environment:
-      BOOND_DOMAIN: ${BOOND_DOMAIN:?Renseignez BOOND_DOMAIN dans .env (ex. boond.exemple.fr)}
+      XPEPERIENCE_DOMAIN: ${XPEPERIENCE_DOMAIN:?Renseignez XPEPERIENCE_DOMAIN dans .env (ex. xpeperience.exemple.fr)}
     volumes:
       - ./deploy/Caddyfile:/etc/caddy/Caddyfile:ro
       - caddy-data:/data

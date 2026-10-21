@@ -56,7 +56,7 @@ async function copy(text: string) {
   <div class="grid-2">
     <div class="stack">
       <form class="card stack" @submit.prevent="saveExt">
-        <div><h2>Import depuis LinkedIn</h2><p class="muted small" style="margin-top: 4px">L'extension ajoute un bouton « Ajouter à Boond by XPEHO » sur les profils LinkedIn. Rien n'est lu ni envoyé avant votre clic, et chaque import passe par un aperçu que vous validez.</p></div>
+        <div><h2>Import depuis LinkedIn</h2><p class="muted small" style="margin-top: 4px">L'extension ajoute un bouton « Ajouter à XpePerience » sur les profils LinkedIn. Rien n'est lu ni envoyé avant votre clic, et chaque import passe par un aperçu que vous validez.</p></div>
         <label class="check"><input v-model="ext.enabled" type="checkbox" :disabled="!canEdit" /><span>Autoriser l'import de contacts depuis LinkedIn</span></label>
         <label class="check"><input v-model="ext.allow_company_creation" type="checkbox" :disabled="!canEdit" /><span>Autoriser la création d'une société depuis l'extension</span></label>
         <label class="check"><input v-model="ext.add_import_note" type="checkbox" :disabled="!canEdit" /><span>Ajouter une note « importé depuis LinkedIn » sur la fiche</span></label>
@@ -70,7 +70,7 @@ async function copy(text: string) {
           <li>Ouvrez <code>chrome://extensions</code> (ou <code>edge://extensions</code>) et activez le <strong>mode développeur</strong>.</li>
           <li>Cliquez sur <strong>Charger l'extension non empaquetée</strong> et choisissez le dossier <code>extension/</code> du projet.</li>
           <li>Ouvrez les options de l'extension, collez l'adresse <code>{{ address }}</code> et le jeton créé ci-contre. Pour un serveur distant, Chrome demande d'autoriser l'accès à cette adresse : acceptez.</li>
-          <li>Sur un profil LinkedIn, cliquez sur l'icône de l'extension puis sur <strong>Ajouter à Boond by XPEHO</strong>.</li>
+          <li>Sur un profil LinkedIn, cliquez sur l'icône de l'extension puis sur <strong>Ajouter à XpePerience</strong>.</li>
         </ol>
         <p class="faint small">L'extension ne communique qu'avec l'adresse que vous avez saisie, jamais avec un autre service.</p>
       </section>

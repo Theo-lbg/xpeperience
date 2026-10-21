@@ -1,11 +1,11 @@
 {
   "manifest_version": 3,
-  "name": "Boond by XPEHO — Ajouter depuis LinkedIn",
-  "short_name": "Boond by XPEHO",
+  "name": "XpePerience — Ajouter depuis LinkedIn",
+  "short_name": "XpePerience",
   "version": "0.2.0",
-  "description": "Ajoutez à Boond by XPEHO le contact du profil LinkedIn que vous consultez, après aperçu et validation.",
+  "description": "Ajoutez à XpePerience le contact du profil LinkedIn que vous consultez, après aperçu et validation.",
   "action": {
-    "default_title": "Ajouter à Boond by XPEHO",
+    "default_title": "Ajouter à XpePerience",
     "default_popup": "popup.html",
     "default_icon": {
       "16": "icons/16.png",

@@ -1,19 +1,19 @@
 [package]
-name = "boond-desktop"
-description = "Application de bureau Boond by XPEHO"
+name = "xpeperience-desktop"
+description = "Application de bureau XpePerience"
 version.workspace = true
 edition.workspace = true
 authors.workspace = true
 
 [[bin]]
-name = "boond-by-xpeho"
+name = "xpeperience"
 path = "src/main.rs"
 
 [build-dependencies]
 tauri-build = { version = "2", features = [] }
 
 [dependencies]
-boond-http.workspace = true
+xpeperience-http.workspace = true
 tauri = { version = "2", features = [] }
 tokio.workspace = true
 urlencoding.workspace = true
