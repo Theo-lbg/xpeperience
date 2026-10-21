@@ -114,14 +114,14 @@ fn configure(conn: &Connection) -> Result<()> {
 const MIGRATIONS: &[&str] = &[include_str!("schema.sql")];
 
 fn migrate(conn: &Connection) -> Result<()> {
-    let version: usize = conn.query_row("PRAGMA user_version", [], |r| r.get(0))?;
-    for (i, sql) in MIGRATIONS.iter().enumerate().skip(version) {
+    let version: i64 = conn.query_row("PRAGMA user_version", [], |r| r.get(0))?;
+    for (i, sql) in MIGRATIONS.iter().enumerate().skip(usize::try_from(version).unwrap_or(0)) {
         let tx = conn.unchecked_transaction()?;
         tx.execute_batch(sql)?;
         if i == 0 {
             seed(&tx)?;
         }
-        tx.pragma_update(None, "user_version", i + 1)?;
+        tx.pragma_update(None, "user_version", i as i64 + 1)?;
         tx.commit()?;
     }
     Ok(())

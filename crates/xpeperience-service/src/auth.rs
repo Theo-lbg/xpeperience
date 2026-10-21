@@ -1,6 +1,6 @@
 //! Comptes, connexion, sessions et jetons d'appairage.
 
-use argon2::password_hash::{PasswordHash, PasswordHasher, PasswordVerifier, SaltString, rand_core::OsRng};
+use argon2::password_hash::{PasswordHasher, PasswordVerifier, phc::PasswordHash};
 use argon2::Argon2;
 use base64::Engine;
 use base64::engine::general_purpose::URL_SAFE_NO_PAD;
@@ -11,7 +11,7 @@ use xpeperience_domain::rules::check_email;
 use xpeperience_domain::text::clean_required;
 use xpeperience_domain::{DomainError, Id, Result};
 use xpeperience_store::Connection;
-use rand::RngCore;
+use rand::TryRng;
 use sha2::{Digest, Sha256};
 
 /// Utilisateur authentifié et ses droits, chargés à chaque requête.
@@ -47,9 +47,9 @@ fn rfc3339(dt: chrono::DateTime<chrono::Utc>) -> String {
 }
 
 pub(crate) fn hash_password(password: &str) -> Result<String> {
-    let salt = SaltString::generate(&mut OsRng);
+    // Le sel aléatoire est généré par la bibliothèque (générateur du système).
     Argon2::default()
-        .hash_password(password.as_bytes(), &salt)
+        .hash_password(password.as_bytes())
         .map(|h| h.to_string())
         .map_err(|e| DomainError::Internal(e.to_string()))
 }
@@ -72,7 +72,8 @@ pub fn hash_secret(secret: &str) -> String {
 /// Nouveau secret aléatoire (256 bits) avec un préfixe lisible.
 pub(crate) fn new_secret(prefix: &str) -> String {
     let mut bytes = [0u8; 32];
-    rand::rngs::OsRng.fill_bytes(&mut bytes);
+    // Octets tirés directement du générateur aléatoire du système d'exploitation.
+    rand::rngs::SysRng.try_fill_bytes(&mut bytes).expect("générateur aléatoire du système indisponible");
     format!("{prefix}{}", URL_SAFE_NO_PAD.encode(bytes))
 }
 
@@ -217,4 +218,36 @@ pub fn change_password(conn: &Connection, me: &AuthUser, input: PasswordChange, 
         xpeperience_store::users::create_session(conn, &hash_secret(t), me.id, &expires)?;
     }
     Ok(())
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    /// Hash produit par la version précédente de la bibliothèque (argon2 0.5) pour un mot de passe de test fictif :
+    /// les comptes existants doivent continuer de se connecter après la mise à jour.
+    const LEGACY_HASH: &str = "$argon2id$v=19$m=19456,t=2,p=1$hyMAm/A4NQV4xKXZFKQjGQ$d+DVr6cLc3NADoNZ+AZyxoHReJFP+9VQplNZEW/h0Ss";
+
+    #[test]
+    fn hashes_created_before_the_upgrade_still_verify() {
+        assert!(verify_password("motdepasse-test-local", LEGACY_HASH));
+        assert!(!verify_password("mauvais-mot-de-passe", LEGACY_HASH));
+    }
+
+    #[test]
+    fn new_hashes_are_argon2id_salted_and_verifiable() {
+        let a = hash_password("un mot de passe fictif").unwrap();
+        let b = hash_password("un mot de passe fictif").unwrap();
+        assert!(a.starts_with("$argon2id$"), "{a}");
+        assert_ne!(a, b, "deux hachages du même mot de passe utilisent des sels différents");
+        assert!(verify_password("un mot de passe fictif", &a));
+        assert!(!verify_password("autre", &a));
+    }
+
+    #[test]
+    fn secrets_are_long_unique_and_prefixed() {
+        let (a, b) = (new_secret("xpe_"), new_secret("xpe_"));
+        assert!(a.starts_with("xpe_") && a.len() >= 4 + 43, "256 bits en base64 : {a}");
+        assert_ne!(a, b);
+    }
 }
