@@ -3,7 +3,7 @@
 use chrono::NaiveDate;
 
 use crate::error::Errors;
-use crate::model::{ExtensionStatus, HrContract};
+use crate::model::ExtensionStatus;
 use crate::settings::Settings;
 
 pub fn parse_date(value: &str) -> Option<NaiveDate> {
@@ -93,32 +93,6 @@ pub fn project_dates(spans: &[DeliverySpan]) -> (Option<String>, Option<String>,
     (start, latest(spans.iter().map(|s| s.effective_end)), latest(spans.iter().map(|s| s.forecast_end)))
 }
 
-/// Contrat RH en cours qui porte un CJM : le plus récent parmi ceux actifs à `today`.
-pub fn current_contract<'a>(contracts: &'a [HrContract], today: &str) -> Option<&'a HrContract> {
-    contracts
-        .iter()
-        .filter(|c| c.daily_cost.is_some())
-        .filter(|c| c.start_date.as_str() <= today && c.end_date.as_deref().is_none_or(|e| e >= today))
-        .max_by(|a, b| a.start_date.cmp(&b.start_date))
-}
-
-/// CJM retenu : celui du contrat RH en cours, sinon celui saisi sur la ressource, sinon inconnu.
-pub fn pick_daily_cost(contract_cost: Option<f64>, manual: Option<f64>) -> (Option<f64>, Option<&'static str>) {
-    match (contract_cost, manual) {
-        (Some(c), _) => (Some(c), Some("contract")),
-        (None, Some(v)) => (Some(v), Some("manual")),
-        (None, None) => (None, None),
-    }
-}
-
-pub fn effective_daily_cost(
-    contracts: &[HrContract],
-    manual: Option<f64>,
-    today: &str,
-) -> (Option<f64>, Option<&'static str>) {
-    pick_daily_cost(current_contract(contracts, today).and_then(|c| c.daily_cost), manual)
-}
-
 /// Une prolongation commence après la fin initiale de la prestation.
 pub fn check_extension(errors: &mut Errors, delivery_end: Option<&str>, start: &str, end: &str) {
     check_range(errors, "end_date", Some(start), Some(end));
@@ -134,19 +108,6 @@ pub fn check_extension(errors: &mut Errors, delivery_end: Option<&str>, start: &
 #[cfg(test)]
 mod tests {
     use super::*;
-
-    fn contract(start: &str, end: Option<&str>, cost: Option<f64>) -> HrContract {
-        HrContract {
-            id: 1,
-            resource_id: 1,
-            contract_type_id: None,
-            start_date: start.into(),
-            end_date: end.map(Into::into),
-            daily_cost: cost,
-            notes: None,
-            created_at: String::new(),
-        }
-    }
 
     #[test]
     fn signed_extension_moves_end_forecast_only_moves_forecast() {
@@ -167,13 +128,5 @@ mod tests {
 
         let open = [DeliverySpan { start: "2026-01-01", effective_end: None, forecast_end: None }];
         assert_eq!(project_dates(&open).1, None);
-    }
-
-    #[test]
-    fn daily_cost_prefers_current_contract_and_may_stay_empty() {
-        let contracts = [contract("2025-01-01", Some("2025-12-31"), Some(300.0)), contract("2026-01-01", None, Some(350.0))];
-        assert_eq!(effective_daily_cost(&contracts, Some(280.0), "2026-03-01"), (Some(350.0), Some("contract")));
-        assert_eq!(effective_daily_cost(&[], Some(280.0), "2026-03-01"), (Some(280.0), Some("manual")));
-        assert_eq!(effective_daily_cost(&[contract("2026-01-01", None, None)], None, "2026-03-01"), (None, None));
     }
 }

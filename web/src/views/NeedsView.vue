@@ -63,6 +63,7 @@ const counts = computed(() => {
   return c
 })
 const columns = computed(() => refsOf('need_state').map((s) => ({ state: s, items: needs.value.filter((n) => n.state_id === s.id) })))
+const multiTypes = computed(() => refsOf('need_type').length > 1)
 const hasFilters = computed(() => !!(filters.q || filters.company_id || filters.owner_id || filters.state_id || filters.type_id || filters.start_from || filters.start_to))
 function reset() {
   Object.assign(filters, { q: '', company_id: '', owner_id: '', state_id: '', type_id: '', start_from: '', start_to: '' })
@@ -110,7 +111,7 @@ async function drop(stateId: number) {
       <select v-model="filters.company_id" class="select" aria-label="Société"><option value="">Toutes les sociétés</option><option v-for="c in companies" :key="c.id" :value="c.id">{{ c.name }}</option></select>
       <select v-model="filters.owner_id" class="select" aria-label="Responsable"><option value="">Tous les responsables</option><option v-for="u in users" :key="u.id" :value="u.id">{{ u.name }}</option></select>
       <select v-model="filters.state_id" class="select" aria-label="État"><option value="">Tous les états</option><option v-for="s in refsOf('need_state')" :key="s.id" :value="s.id">{{ s.label }}</option></select>
-      <select v-model="filters.type_id" class="select" aria-label="Type"><option value="">Tous les types</option><option v-for="s in refsOf('need_type')" :key="s.id" :value="s.id">{{ s.label }}</option></select>
+      <select v-if="refsOf('need_type').length > 1" v-model="filters.type_id" class="select" aria-label="Type"><option value="">Tous les types</option><option v-for="s in refsOf('need_type')" :key="s.id" :value="s.id">{{ s.label }}</option></select>
       <label class="row small muted" style="gap: 6px">Démarrage <input v-model="filters.start_from" class="input" type="date" style="width: 150px" aria-label="Démarrage à partir du" /> → <input v-model="filters.start_to" class="input" type="date" style="width: 150px" aria-label="Démarrage jusqu’au" /></label>
       <button v-if="hasFilters" class="btn ghost small" type="button" @click="reset">Effacer les filtres</button>
     </div>
@@ -125,13 +126,13 @@ async function drop(stateId: number) {
     <div v-else-if="view === 'list'" class="card flush">
       <div class="table-wrap">
         <table class="table">
-          <thead><tr><th>Besoin</th><th>Société</th><th>Contact</th><th>Type</th><th>État</th><th>Démarrage</th><th>Responsable</th><th class="right">Positionnements</th></tr></thead>
+          <thead><tr><th>Besoin</th><th>Société</th><th>Contact</th><th v-if="multiTypes">Type</th><th>État</th><th>Démarrage</th><th>Responsable</th><th class="right">Positionnements</th></tr></thead>
           <tbody>
             <tr v-for="n in byStatus" :key="n.id" class="click" :class="{ 'archived-row': n.archived }" @click="router.push(`/needs/${n.id}`)">
               <td class="cell-link"><RouterLink :to="`/needs/${n.id}`" class="name" @click.stop>{{ n.title }}</RouterLink><div v-if="n.skills.length" class="sub">{{ n.skills.slice(0, 4).join(' · ') }}</div></td>
               <td><RouterLink v-if="n.company" :to="`/crm/companies/${n.company.id}`" class="link" @click.stop>{{ n.company.name }}</RouterLink><span v-else class="faint">—</span></td>
               <td>{{ n.contact?.name ?? '—' }}</td>
-              <td><RefPill :id="n.type_id" empty="—" /></td>
+              <td v-if="multiTypes"><RefPill :id="n.type_id" empty="—" /></td>
               <td><RefPill :id="n.state_id" /></td>
               <td>{{ fmtDate(n.start_date) }}</td>
               <td>{{ n.owner?.name ?? '—' }}</td>
@@ -149,7 +150,7 @@ async function drop(stateId: number) {
           <div class="title">{{ n.title }}</div>
           <div class="muted small">{{ n.company?.name ?? '—' }}<template v-if="n.contact"> · {{ n.contact.name }}</template></div>
           <div class="row between small">
-            <RefPill :id="n.type_id" />
+            <RefPill v-if="multiTypes" :id="n.type_id" />
             <span class="faint">{{ n.start_date ? fmtDate(n.start_date) : '' }}</span>
           </div>
           <div v-if="n.positionings_count" class="small faint"><Icon name="link" style="width: 13px; vertical-align: -2px" /> {{ n.positionings_count }} positionnement(s)</div>

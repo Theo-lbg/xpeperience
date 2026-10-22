@@ -1,30 +1,26 @@
-//! Ressources (candidats et consultants), contrats RH et documents.
+//! Ressources (candidats et consultants) et documents.
 
 use xpeperience_domain::Id;
-use xpeperience_domain::model::{HrContract, HrContractInput, Resource, ResourceFile, ResourceFilter, ResourceInput, ResourceKind};
-use xpeperience_domain::rules::pick_daily_cost;
+use xpeperience_domain::model::{Resource, ResourceFile, ResourceFilter, ResourceInput, ResourceKind};
 use rusqlite::{Connection, OptionalExtension, Row, params};
 
 use crate::sql::{DELIVERY_EFFECTIVE_END, Filter, iso_literal, named, query, tags_from_json, tags_to_json};
 use crate::{Result, now, today};
 
 /// Requête de base. `mission_until` vaut la fin de la prestation en cours (ou `9999-12-31`
-/// pour une prestation sans fin) ; `contract_cost` le CJM du contrat RH en cours.
+/// pour une prestation sans fin).
 fn select(today: &str) -> String {
     let t = iso_literal(today);
     format!(
         "WITH base AS (SELECT r.*, \
            (SELECT MAX({DELIVERY_EFFECTIVE_END}) FROM deliveries d \
               WHERE d.resource_id = r.id AND d.start_date <= '{t}' AND ({DELIVERY_EFFECTIVE_END}) >= '{t}') AS mission_until, \
-           (SELECT h.daily_cost FROM hr_contracts h WHERE h.resource_id = r.id AND h.daily_cost IS NOT NULL \
-              AND h.start_date <= '{t}' AND (h.end_date IS NULL OR h.end_date >= '{t}') \
-              ORDER BY h.start_date DESC LIMIT 1) AS contract_cost, \
            (SELECT COUNT(*) FROM positionings x JOIN ref_items s ON s.id = x.state_id \
               WHERE x.resource_id = r.id AND s.category = 'open') AS open_positionings \
          FROM resources r) \
          SELECT b.id, b.kind, b.first_name, b.last_name, b.title, b.email, b.phone, b.location, b.linkedin_url, b.skills, \
            b.experience_years, b.experience, b.availability_date, b.availability_note, b.contract_type_id, b.daily_cost, \
-           b.contract_cost, b.notes, b.owner_id, u.first_name || ' ' || u.last_name, b.archived_at IS NOT NULL, \
+           b.notes, b.owner_id, u.first_name || ' ' || u.last_name, b.archived_at IS NOT NULL, \
            b.created_at, b.updated_at, b.mission_until, b.open_positionings \
          FROM base b LEFT JOIN users u ON u.id = b.owner_id"
     )
@@ -32,9 +28,7 @@ fn select(today: &str) -> String {
 
 fn map(r: &Row) -> rusqlite::Result<Resource> {
     let kind: String = r.get(1)?;
-    let daily_cost: Option<f64> = r.get(15)?;
-    let (effective, source) = pick_daily_cost(r.get(16)?, daily_cost);
-    let mission: Option<String> = r.get(23)?;
+    let mission: Option<String> = r.get(22)?;
     Ok(Resource {
         id: r.get(0)?,
         kind: ResourceKind::from_code(&kind).unwrap_or(ResourceKind::Candidate),
@@ -51,17 +45,15 @@ fn map(r: &Row) -> rusqlite::Result<Resource> {
         availability_date: r.get(12)?,
         availability_note: r.get(13)?,
         contract_type_id: r.get(14)?,
-        daily_cost,
-        effective_daily_cost: effective,
-        daily_cost_source: source.map(str::to_string),
-        notes: r.get(17)?,
-        owner: named(r.get(18)?, r.get(19)?),
-        archived: r.get(20)?,
-        created_at: r.get(21)?,
-        updated_at: r.get(22)?,
+        daily_cost: r.get(15)?,
+        notes: r.get(16)?,
+        owner: named(r.get(17)?, r.get(18)?),
+        archived: r.get(19)?,
+        created_at: r.get(20)?,
+        updated_at: r.get(21)?,
         on_mission: mission.is_some(),
         on_mission_until: mission.filter(|m| m != "9999-12-31"),
-        open_positionings: r.get(24)?,
+        open_positionings: r.get(23)?,
     })
 }
 
@@ -167,54 +159,6 @@ pub fn find_by_email(conn: &Connection, email: &str, exclude: Option<Id>) -> Res
             |r| Ok((r.get(0)?, r.get(1)?)),
         )
         .optional()?)
-}
-
-// ───────────────────────────── Contrats RH ─────────────────────────────
-
-const CONTRACT_SELECT: &str =
-    "SELECT id, resource_id, contract_type_id, start_date, end_date, daily_cost, notes, created_at FROM hr_contracts";
-
-fn map_contract(r: &Row) -> rusqlite::Result<HrContract> {
-    Ok(HrContract {
-        id: r.get(0)?,
-        resource_id: r.get(1)?,
-        contract_type_id: r.get(2)?,
-        start_date: r.get(3)?,
-        end_date: r.get(4)?,
-        daily_cost: r.get(5)?,
-        notes: r.get(6)?,
-        created_at: r.get(7)?,
-    })
-}
-
-pub fn contracts(conn: &Connection, resource_id: Id) -> Result<Vec<HrContract>> {
-    query(conn, &format!("{CONTRACT_SELECT} WHERE resource_id = ?1 ORDER BY start_date DESC"), &[resource_id.into()], map_contract)
-}
-
-pub fn contract(conn: &Connection, id: Id) -> Result<Option<HrContract>> {
-    Ok(conn.query_row(&format!("{CONTRACT_SELECT} WHERE id = ?1"), [id], map_contract).optional()?)
-}
-
-pub fn insert_contract(conn: &Connection, resource_id: Id, i: &HrContractInput) -> Result<Id> {
-    conn.execute(
-        "INSERT INTO hr_contracts (resource_id, contract_type_id, start_date, end_date, daily_cost, notes, created_at) \
-         VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7)",
-        params![resource_id, i.contract_type_id, i.start_date, i.end_date, i.daily_cost, i.notes, now()],
-    )?;
-    Ok(conn.last_insert_rowid())
-}
-
-pub fn update_contract(conn: &Connection, id: Id, i: &HrContractInput) -> Result<()> {
-    conn.execute(
-        "UPDATE hr_contracts SET contract_type_id = ?2, start_date = ?3, end_date = ?4, daily_cost = ?5, notes = ?6 WHERE id = ?1",
-        params![id, i.contract_type_id, i.start_date, i.end_date, i.daily_cost, i.notes],
-    )?;
-    Ok(())
-}
-
-pub fn delete_contract(conn: &Connection, id: Id) -> Result<()> {
-    conn.execute("DELETE FROM hr_contracts WHERE id = ?1", [id])?;
-    Ok(())
 }
 
 // ───────────────────────────── Documents ─────────────────────────────

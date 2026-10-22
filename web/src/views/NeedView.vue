@@ -136,7 +136,7 @@ const money = (p: Positioning) => (p.daily_rate != null && p.days != null ? fmtM
               <dt>Démarrage souhaité</dt><dd>{{ fmtDate(need.start_date) }}</dd>
               <dt>Durée</dt><dd>{{ fmtNumber(need.duration_months, 'mois') }}</dd>
               <dt>Jours prévus</dt><dd>{{ fmtNumber(need.planned_days, 'jours') }}</dd>
-              <dt>Budget éventuel</dt><dd>{{ fmtMoney(need.budget) }}</dd>
+              <template v-if="need.budget != null"><dt>Budget éventuel</dt><dd>{{ fmtMoney(need.budget) }}</dd></template>
               <dt>Lieu</dt><dd>{{ need.location ?? '—' }}</dd>
               <dt>Responsable commercial</dt><dd>{{ need.owner?.name ?? '—' }}</dd>
               <dt>Compétences</dt><dd><div v-if="need.skills.length" class="tags"><span v-for="s in need.skills" :key="s" class="tag">{{ s }}</span></div><template v-else>—</template></dd>
@@ -150,7 +150,7 @@ const money = (p: Positioning) => (p.daily_rate != null && p.days != null ? fmtM
               <button v-if="can('positionings', 'create') && !need.archived" class="btn primary small" type="button" @click="positioning = {}"><Icon name="plus" /> Positionner</button>
             </div>
             <EmptyState v-if="!positionings.length" icon="briefcase" title="Aucune ressource positionnée">
-              Proposez des candidats ou des consultants pour ce besoin : par sélection directe, recherche filtrée ou suggestions.
+              Proposez des profils pour ce besoin : par sélection directe, recherche filtrée ou suggestions.
               <template v-if="can('positionings', 'create') && !need.archived" #actions><button class="btn primary" type="button" @click="positioning = {}">Positionner une ressource</button></template>
             </EmptyState>
             <div v-else class="table-wrap">

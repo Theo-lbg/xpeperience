@@ -91,7 +91,7 @@ pub fn create_positioning(conn: &mut Connection, me: &AuthUser, input: Positioni
     i.start_date = i.start_date.or(need.start_date.clone());
     i.days = i.days.or(need.planned_days);
     if !can_edit_costs(me) || i.daily_cost.is_none() {
-        i.daily_cost = resource.effective_daily_cost;
+        i.daily_cost = resource.daily_cost;
     }
     check_values(&refs, &i)?;
     let state_id = match i.state_id {

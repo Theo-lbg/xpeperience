@@ -3,10 +3,10 @@ use axum::extract::{Path, Query, State};
 use axum::http::header::{CONTENT_DISPOSITION, CONTENT_TYPE};
 use axum::http::{HeaderMap, HeaderValue, StatusCode};
 use axum::response::{IntoResponse, Response};
-use axum::routing::{get, post, put};
+use axum::routing::{get, post};
 use axum::{Json, Router};
 use xpeperience_domain::model::{
-    ArchiveInput, HrContract, HrContractInput, Resource, ResourceFile, ResourceFilter, ResourceInput,
+    ArchiveInput, Resource, ResourceFile, ResourceFilter, ResourceInput,
 };
 use xpeperience_domain::{DomainError, Id};
 use xpeperience_service::resources;
@@ -22,8 +22,6 @@ pub fn routes() -> Router<AppState> {
         .route("/api/resources/{id}", get(get_resource).put(update_resource).delete(delete_resource))
         .route("/api/resources/{id}/archive", post(archive_resource))
         .route("/api/resources/{id}/convert", post(convert_resource))
-        .route("/api/resources/{id}/contracts", get(list_contracts).post(create_contract))
-        .route("/api/contracts/{id}", put(update_contract).delete(delete_contract))
         .route("/api/resources/{id}/files", get(list_files).post(upload_file))
         .route("/api/files/{id}", get(download_file).delete(delete_file))
 }
@@ -67,33 +65,6 @@ async fn delete_resource(State(s): State<AppState>, CurrentUser(me): CurrentUser
     for f in files {
         let _ = tokio::fs::remove_file(s.documents_dir().join(&f.stored_name)).await;
     }
-    Ok(StatusCode::NO_CONTENT)
-}
-
-async fn list_contracts(State(s): State<AppState>, CurrentUser(me): CurrentUser, Path(id): Path<Id>) -> ApiResult<Json<Vec<HrContract>>> {
-    s.run(move |c| resources::contracts(c, &me, id)).await.map(Json)
-}
-
-async fn create_contract(
-    State(s): State<AppState>,
-    CurrentUser(me): CurrentUser,
-    Path(id): Path<Id>,
-    Body(i): Body<HrContractInput>,
-) -> ApiResult<Json<HrContract>> {
-    s.run(move |c| resources::create_contract(c, &me, id, i)).await.map(Json)
-}
-
-async fn update_contract(
-    State(s): State<AppState>,
-    CurrentUser(me): CurrentUser,
-    Path(id): Path<Id>,
-    Body(i): Body<HrContractInput>,
-) -> ApiResult<Json<HrContract>> {
-    s.run(move |c| resources::update_contract(c, &me, id, i)).await.map(Json)
-}
-
-async fn delete_contract(State(s): State<AppState>, CurrentUser(me): CurrentUser, Path(id): Path<Id>) -> ApiResult<StatusCode> {
-    s.run(move |c| resources::delete_contract(c, &me, id)).await?;
     Ok(StatusCode::NO_CONTENT)
 }
 

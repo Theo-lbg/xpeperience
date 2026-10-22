@@ -68,13 +68,9 @@ export interface Resource {
   phone: string | null; location: string | null; linkedin_url: string | null; skills: string[]
   experience_years: number | null; experience: string | null; availability_date: string | null
   availability_note: string | null; contract_type_id: Id | null; daily_cost: number | null
-  effective_daily_cost: number | null; daily_cost_source: 'contract' | 'manual' | null; notes: string | null
+  notes: string | null
   owner: Named | null; archived: boolean; created_at: string; updated_at: string
   on_mission_until: string | null; on_mission: boolean; open_positionings: number
-}
-export interface HrContract {
-  id: Id; resource_id: Id; contract_type_id: Id | null; start_date: string; end_date: string | null
-  daily_cost: number | null; notes: string | null; created_at: string
 }
 export interface ResourceFile { id: Id; resource_id: Id; kind: 'cv' | 'skills_file' | 'other'; filename: string; mime: string; size: number; uploaded_at: string }
 export interface Positioning {
@@ -113,3 +109,8 @@ export interface Dashboard {
 }
 export interface SearchHit { kind: EntityKind; id: Id; title: string; subtitle: string | null }
 export interface DuplicateContact { id: Id; name: string; company: string | null; job_title: string | null; reason: string }
+
+export interface NeedDraft {
+  title: string; description: string; skills: string[]; location: string | null; start_date: string | null
+  duration_months: number | null; planned_days: number | null; emails: string[]; contact: Named | null
+}

@@ -67,7 +67,7 @@ const form = reactive({
   notes: p?.notes ?? '',
 })
 watch(picked, (r) => {
-  if (r && !editing && !form.daily_cost) form.daily_cost = r.effective_daily_cost?.toString() ?? ''
+  if (r && !editing && !form.daily_cost) form.daily_cost = r.daily_cost?.toString() ?? ''
 }, { immediate: true })
 
 async function save() {
@@ -121,7 +121,7 @@ const dot = (r: Suggestion['reasons'][number]) => (r.positive ? 'green' : 'red')
             <select v-model="availability" class="select"><option value="">Toute disponibilité</option><option value="now">Disponible maintenant</option></select>
           </template>
         </div>
-        <EmptyState v-if="!filtered.length" compact title="Aucune ressource trouvée">Modifiez la recherche ou créez la fiche depuis la page Ressources.</EmptyState>
+        <EmptyState v-if="!filtered.length" compact title="Aucun profil trouvé">Modifiez la recherche ou créez la fiche depuis la page Profils.</EmptyState>
         <button v-for="r in filtered.slice(0, 40)" :key="r.id" type="button" class="pick" @click="picked = r">
           <span class="avatar">{{ initials(`${r.first_name} ${r.last_name}`) }}</span>
           <span class="grow">
@@ -148,7 +148,7 @@ const dot = (r: Suggestion['reasons'][number]) => (r.positive ? 'green' : 'red')
       <Field label="Fin prévue" :error="errors.end_date" for="pe"><input id="pe" v-model="form.end_date" class="input" :class="{ invalid: errors.end_date }" type="date" /></Field>
       <Field label="Tarif journalier de vente (€)" :error="errors.daily_rate" hint="Facultatif." for="pr"><input id="pr" v-model="form.daily_rate" class="input" inputmode="decimal" /></Field>
       <Field label="Jours à vendre" :error="errors.days" hint="Facultatif." for="pj"><input id="pj" v-model="form.days" class="input" inputmode="decimal" /></Field>
-      <Field v-if="showCost" label="CJM (€)" :error="errors.daily_cost" :hint="picked.effective_daily_cost != null ? `Proposé d’après ${picked.daily_cost_source === 'contract' ? 'le contrat RH' : 'la fiche'} : ${fmtMoney(picked.effective_daily_cost)}` : 'Facultatif : inconnu pour le moment, vous pourrez le compléter plus tard.'" for="pc">
+      <Field v-if="showCost" label="CJM (€)" :error="errors.daily_cost" :hint="picked.daily_cost != null ? `Proposé d’après la fiche : ${fmtMoney(picked.daily_cost)}` : 'Facultatif : inconnu pour le moment, vous pourrez le compléter plus tard.'" for="pc">
         <input id="pc" v-model="form.daily_cost" class="input" inputmode="decimal" placeholder="Non renseigné" :disabled="!can('costs', 'update')" />
       </Field>
       <Field class="full" label="Notes" for="pn"><textarea id="pn" v-model="form.notes" class="textarea" /></Field>

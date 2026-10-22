@@ -1,19 +1,19 @@
-//! Ressources : candidats et consultants, contrats RH, documents.
+//! Ressources : candidats et consultants, documents.
 
 use xpeperience_domain::error::Errors;
 use xpeperience_domain::model::{
-    EntityKind, HrContract, HrContractInput, Resource, ResourceFile, ResourceFilter, ResourceInput, ResourceKind,
+    EntityKind, Resource, ResourceFile, ResourceFilter, ResourceInput, ResourceKind,
 };
 use xpeperience_domain::permissions::{Action, Area};
 use xpeperience_domain::refs::RefList;
-use xpeperience_domain::rules::{check_amount, check_date, check_email, check_range, check_required};
+use xpeperience_domain::rules::{check_amount, check_date, check_email, check_required};
 use xpeperience_domain::text::{clean, clean_required, clean_tags, linkedin_key};
 use xpeperience_domain::{DomainError, Id, Result};
 use xpeperience_store::Connection;
 
 use crate::AuthUser;
 use crate::support::{
-    Diff, Refs, Trace, begin, can_edit_costs, check_user, commit, hide_contract_costs, hide_resource_costs, trace,
+    Diff, Refs, Trace, begin, can_edit_costs, check_user, commit, hide_resource_costs, trace,
 };
 
 fn get(conn: &Connection, id: Id) -> Result<Resource> {
@@ -207,80 +207,6 @@ pub fn delete_resource(conn: &mut Connection, me: &AuthUser, id: Id) -> Result<V
     trace_resource(&tx, me, &r, "deleted", Vec::new())?;
     commit(tx)?;
     Ok(files)
-}
-
-// ───────────────────────────── Contrats RH ─────────────────────────────
-
-pub fn contracts(conn: &Connection, me: &AuthUser, resource_id: Id) -> Result<Vec<HrContract>> {
-    me.require(Area::Resources, Action::Read)?;
-    me.require(Area::Costs, Action::Read)?;
-    let mut list = xpeperience_store::resources::contracts(conn, resource_id)?;
-    list.iter_mut().for_each(|c| hide_contract_costs(me, c));
-    Ok(list)
-}
-
-fn clean_contract(refs: &Refs, i: HrContractInput) -> Result<HrContractInput> {
-    let i = HrContractInput {
-        start_date: i.start_date.trim().to_string(),
-        end_date: clean(i.end_date),
-        notes: clean(i.notes),
-        ..i
-    };
-    let mut errors = Errors::new();
-    if i.start_date.is_empty() {
-        errors.add("start_date", "Indiquez la date de début du contrat.");
-    }
-    check_date(&mut errors, "start_date", Some(&i.start_date).filter(|s| !s.is_empty()).map(|s| s.as_str()));
-    check_date(&mut errors, "end_date", i.end_date.as_deref());
-    check_range(&mut errors, "end_date", Some(&i.start_date), i.end_date.as_deref());
-    check_amount(&mut errors, "daily_cost", i.daily_cost);
-    refs.check(&mut errors, "contract_type_id", RefList::ContractType, i.contract_type_id);
-    errors.finish()?;
-    Ok(i)
-}
-
-fn contract_change(c: &HrContractInput, before: Option<&HrContract>) -> xpeperience_domain::model::FieldChange {
-    let fmt = |start: &str, end: Option<&str>| format!("{start} → {}", end.unwrap_or("sans fin"));
-    xpeperience_domain::model::FieldChange {
-        field: "Contrat RH".into(),
-        from: before.map(|b| fmt(&b.start_date, b.end_date.as_deref())),
-        to: Some(fmt(&c.start_date, c.end_date.as_deref())),
-    }
-}
-
-pub fn create_contract(conn: &mut Connection, me: &AuthUser, resource_id: Id, input: HrContractInput) -> Result<HrContract> {
-    me.require(Area::Resources, Action::Update)?;
-    me.require(Area::Costs, Action::Update)?;
-    let tx = begin(conn)?;
-    let r = get(&tx, resource_id)?;
-    let refs = Refs::load(&tx)?;
-    let i = clean_contract(&refs, input)?;
-    let id = xpeperience_store::resources::insert_contract(&tx, resource_id, &i)?;
-    trace_resource(&tx, me, &r, "updated", vec![contract_change(&i, None)])?;
-    commit(tx)?;
-    xpeperience_store::resources::contract(conn, id)?.ok_or(DomainError::NotFound("Contrat"))
-}
-
-pub fn update_contract(conn: &mut Connection, me: &AuthUser, id: Id, input: HrContractInput) -> Result<HrContract> {
-    me.require(Area::Resources, Action::Update)?;
-    me.require(Area::Costs, Action::Update)?;
-    let tx = begin(conn)?;
-    let old = xpeperience_store::resources::contract(&tx, id)?.ok_or(DomainError::NotFound("Contrat"))?;
-    let r = get(&tx, old.resource_id)?;
-    let refs = Refs::load(&tx)?;
-    let i = clean_contract(&refs, input)?;
-    xpeperience_store::resources::update_contract(&tx, id, &i)?;
-    trace_resource(&tx, me, &r, "updated", vec![contract_change(&i, Some(&old))])?;
-    commit(tx)?;
-    xpeperience_store::resources::contract(conn, id)?.ok_or(DomainError::NotFound("Contrat"))
-}
-
-pub fn delete_contract(conn: &Connection, me: &AuthUser, id: Id) -> Result<()> {
-    me.require(Area::Resources, Action::Update)?;
-    me.require(Area::Costs, Action::Update)?;
-    xpeperience_store::resources::contract(conn, id)?.ok_or(DomainError::NotFound("Contrat"))?;
-    xpeperience_store::resources::delete_contract(conn, id)?;
-    Ok(())
 }
 
 // ───────────────────────────── Documents ─────────────────────────────

@@ -87,7 +87,6 @@ pub fn usage(conn: &Connection, id: Id) -> Result<i64> {
         ("projects", "state_id"),
         ("deliveries", "type_id"),
         ("resources", "contract_type_id"),
-        ("hr_contracts", "contract_type_id"),
     ];
     let mut total = 0;
     for (table, column) in USES {

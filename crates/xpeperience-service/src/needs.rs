@@ -1,7 +1,7 @@
 //! Besoins clients : création, suivi des états et passage en projet.
 
 use xpeperience_domain::error::Errors;
-use xpeperience_domain::model::{EntityKind, Need, NeedFilter, NeedInput, Project, ProjectInput};
+use xpeperience_domain::model::{EntityKind, Named, Need, NeedDraft, NeedFilter, NeedInput, Project, ProjectInput};
 use xpeperience_domain::permissions::{Action, Area};
 use xpeperience_domain::refs::{RefList, project_kind_for_need};
 use xpeperience_domain::rules::{check_amount, check_date, check_required};
@@ -15,6 +15,21 @@ use crate::support::{Diff, Refs, Trace, begin, check_user, commit, trace};
 pub fn needs(conn: &Connection, me: &AuthUser, f: &NeedFilter) -> Result<Vec<Need>> {
     me.require(Area::Needs, Action::Read)?;
     Ok(xpeperience_store::needs::list(conn, f)?)
+}
+
+/// Propose les champs d'un besoin à partir d'un texte collé, sans rien enregistrer.
+pub fn draft_from_text(conn: &Connection, me: &AuthUser, text: &str) -> Result<NeedDraft> {
+    me.require(Area::Needs, Action::Create)?;
+    let mut draft = xpeperience_domain::need_draft::extract(text);
+    if me.can(Area::Crm, Action::Read) {
+        for email in &draft.emails {
+            if let Some((id, name)) = xpeperience_store::contacts::find_by_email(conn, email)? {
+                draft.contact = Some(Named { id, name });
+                break;
+            }
+        }
+    }
+    Ok(draft)
 }
 
 pub fn need(conn: &Connection, me: &AuthUser, id: Id) -> Result<Need> {

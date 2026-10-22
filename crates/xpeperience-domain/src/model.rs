@@ -364,6 +364,27 @@ pub struct NeedInput {
     pub owner_id: Option<Id>,
 }
 
+/// Champs proposés à partir d'un texte collé ; rien n'est enregistré.
+#[derive(Debug, Clone, Serialize)]
+pub struct NeedDraft {
+    pub title: String,
+    pub description: String,
+    pub skills: Vec<String>,
+    pub location: Option<String>,
+    pub start_date: Option<String>,
+    pub duration_months: Option<f64>,
+    pub planned_days: Option<f64>,
+    /// Adresses e-mail trouvées dans le texte.
+    pub emails: Vec<String>,
+    /// Contact existant reconnu à son adresse e-mail.
+    pub contact: Option<Named>,
+}
+
+#[derive(Debug, Clone, Deserialize)]
+pub struct NeedDraftInput {
+    pub text: String,
+}
+
 #[derive(Debug, Clone, Deserialize, Default)]
 pub struct NeedFilter {
     pub q: Option<String>,
@@ -427,12 +448,7 @@ pub struct Resource {
     pub availability_date: Option<String>,
     pub availability_note: Option<String>,
     pub contract_type_id: Option<Id>,
-    /// CJM saisi directement sur la ressource.
     pub daily_cost: Option<f64>,
-    /// CJM retenu : contrat RH en cours, sinon CJM saisi.
-    pub effective_daily_cost: Option<f64>,
-    /// `contract` ou `manual`.
-    pub daily_cost_source: Option<String>,
     pub notes: Option<String>,
     pub owner: Option<Named>,
     pub archived: bool,
@@ -482,27 +498,6 @@ pub struct ResourceFilter {
     pub skill: Option<String>,
     pub location: Option<String>,
     pub archived: Option<bool>,
-}
-
-#[derive(Debug, Clone, Serialize)]
-pub struct HrContract {
-    pub id: Id,
-    pub resource_id: Id,
-    pub contract_type_id: Option<Id>,
-    pub start_date: String,
-    pub end_date: Option<String>,
-    pub daily_cost: Option<f64>,
-    pub notes: Option<String>,
-    pub created_at: String,
-}
-
-#[derive(Debug, Clone, Deserialize, Default)]
-pub struct HrContractInput {
-    pub contract_type_id: Option<Id>,
-    pub start_date: String,
-    pub end_date: Option<String>,
-    pub daily_cost: Option<f64>,
-    pub notes: Option<String>,
 }
 
 #[derive(Debug, Clone, Serialize)]

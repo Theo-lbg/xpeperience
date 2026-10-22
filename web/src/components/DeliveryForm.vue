@@ -24,7 +24,7 @@ onMounted(async () => {
 })
 const req = (f: string) => isRequired('delivery', f)
 const showCost = can('costs', 'read')
-const known = () => resources.value.find((r) => r.id === form.resource_id)?.effective_daily_cost
+const known = () => resources.value.find((r) => r.id === form.resource_id)?.daily_cost
 
 async function save() {
   const body = {

@@ -256,7 +256,7 @@ pub fn create_delivery(conn: &mut Connection, me: &AuthUser, project_id: Id, inp
     if !can_edit_costs(me) || i.daily_cost.is_none() {
         // Le CJM est repris de la ressource quand il est connu ; il peut rester vide.
         i.daily_cost = match i.resource_id {
-            Some(rid) => xpeperience_store::resources::get(&tx, rid)?.and_then(|r| r.effective_daily_cost),
+            Some(rid) => xpeperience_store::resources::get(&tx, rid)?.and_then(|r| r.daily_cost),
             None => None,
         };
     }

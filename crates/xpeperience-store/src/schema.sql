@@ -124,18 +124,6 @@ CREATE TABLE resources (
     updated_at        TEXT NOT NULL
 );
 
-CREATE TABLE hr_contracts (
-    id               INTEGER PRIMARY KEY,
-    resource_id      INTEGER NOT NULL REFERENCES resources(id) ON DELETE CASCADE,
-    contract_type_id INTEGER REFERENCES ref_items(id),
-    start_date       TEXT NOT NULL,
-    end_date         TEXT,
-    daily_cost       REAL,
-    notes            TEXT,
-    created_at       TEXT NOT NULL
-);
-CREATE INDEX hr_contracts_resource ON hr_contracts(resource_id);
-
 CREATE TABLE resource_files (
     id          INTEGER PRIMARY KEY,
     resource_id INTEGER NOT NULL REFERENCES resources(id) ON DELETE CASCADE,

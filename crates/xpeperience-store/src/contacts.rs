@@ -124,6 +124,17 @@ pub fn links(conn: &Connection, id: Id) -> Result<i64> {
     )?)
 }
 
+/// Contact (non archivé ou non) dont l'adresse e-mail correspond exactement.
+pub fn find_by_email(conn: &Connection, email: &str) -> Result<Option<(Id, String)>> {
+    Ok(conn
+        .query_row(
+            "SELECT id, COALESCE(first_name || ' ', '') || last_name FROM contacts WHERE email = ?1 COLLATE NOCASE LIMIT 1",
+            [email],
+            |r| Ok((r.get(0)?, r.get(1)?)),
+        )
+        .optional()?)
+}
+
 pub struct DuplicateQuery<'a> {
     pub first_name: Option<&'a str>,
     pub last_name: &'a str,

@@ -4,7 +4,7 @@ use axum::routing::{get, post, put};
 use axum::{Json, Router};
 use xpeperience_domain::Id;
 use xpeperience_domain::model::{
-    ArchiveInput, ConvertInput, Need, NeedFilter, NeedInput, Positioning, PositioningFilter, PositioningInput,
+    ArchiveInput, ConvertInput, Need, NeedDraft, NeedDraftInput, NeedFilter, NeedInput, Positioning, PositioningFilter, PositioningInput,
     PositioningSaved, Project, StateChange, Suggestion,
 };
 use xpeperience_service::{needs, positionings};
@@ -16,6 +16,7 @@ use crate::state::AppState;
 pub fn routes() -> Router<AppState> {
     Router::new()
         .route("/api/needs", get(list_needs).post(create_need))
+        .route("/api/needs/draft", post(draft_need))
         .route("/api/needs/{id}", get(get_need).put(update_need).delete(delete_need))
         .route("/api/needs/{id}/archive", post(archive_need))
         .route("/api/needs/{id}/state", put(set_state))
@@ -28,6 +29,10 @@ pub fn routes() -> Router<AppState> {
 
 async fn list_needs(State(s): State<AppState>, CurrentUser(me): CurrentUser, Query(f): Query<NeedFilter>) -> ApiResult<Json<Vec<Need>>> {
     s.run(move |c| needs::needs(c, &me, &f)).await.map(Json)
+}
+
+async fn draft_need(State(s): State<AppState>, CurrentUser(me): CurrentUser, Body(i): Body<NeedDraftInput>) -> ApiResult<Json<NeedDraft>> {
+    s.run(move |c| needs::draft_from_text(c, &me, &i.text)).await.map(Json)
 }
 
 async fn get_need(State(s): State<AppState>, CurrentUser(me): CurrentUser, Path(id): Path<Id>) -> ApiResult<Json<Need>> {

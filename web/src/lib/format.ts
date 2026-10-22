@@ -116,5 +116,5 @@ export const actionLabel = (a: string) => ACTION_LABEL[a] ?? a
 
 export const ACTIVITY_LABEL = { call: 'Appel', meeting: 'Rendez-vous', email: 'E-mail', follow_up: 'Relance', note: 'Note' } as const
 
-export const RESOURCE_KIND_LABEL = { candidate: 'Candidat', consultant: 'Consultant' } as const
+export const RESOURCE_KIND_LABEL = { candidate: 'À recruter', consultant: 'En poste' } as const
 export const FILE_KIND_LABEL = { cv: 'CV', skills_file: 'Dossier de compétences', other: 'Autre document' } as const

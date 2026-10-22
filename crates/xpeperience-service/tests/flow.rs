@@ -69,7 +69,7 @@ fn from_company_to_project_without_known_daily_cost() {
         ResourceInput { first_name: "Alex".into(), last_name: "Exemple".into(), skills: vec!["Rust".into(), "Vue.js".into()], ..Default::default() },
     )
     .unwrap();
-    assert_eq!(resource.effective_daily_cost, None);
+    assert_eq!(resource.daily_cost, None);
 
     let suggestions = positionings::suggestions(&conn, &me, need.id).unwrap();
     assert_eq!(suggestions.first().map(|s| s.resource.id), Some(resource.id));
@@ -154,10 +154,9 @@ fn permissions_are_enforced_on_the_server() {
         ResourceInput { first_name: "Dominique".into(), last_name: "Exemple".into(), daily_cost: Some(390.0), ..Default::default() },
     )
     .unwrap();
-    assert_eq!(r.effective_daily_cost, Some(390.0));
+    assert_eq!(r.daily_cost, Some(390.0));
     let seen = resources::resource(&conn, &reader, r.id).unwrap();
-    assert_eq!(seen.effective_daily_cost, None);
-    assert!(resources::contracts(&conn, &reader, r.id).is_err());
+    assert_eq!(seen.daily_cost, None);
 
     // Le dernier administrateur ne peut pas se retirer ses droits.
     let me_user = xpeperience_store::users::get(&conn, me.id).unwrap().unwrap();
@@ -229,4 +228,22 @@ fn login_session_and_linkedin_import() {
 
     admin::revoke_token(&conn, &me, created.token.id).unwrap();
     assert!(auth::token_user(&conn, &created.secret).is_err());
+}
+
+#[test]
+fn need_draft_recognises_the_client_contact_by_email() {
+    let (mut conn, me) = setup();
+    let company = crm::create_company(&mut conn, &me, CompanyInput { name: "Client Fictif".into(), ..Default::default() }).unwrap();
+    let contact = crm::create_contact(
+        &mut conn,
+        &me,
+        ContactInput { company_id: Some(company.id), first_name: Some("Marie".into()), last_name: "Exemple".into(), email: Some("marie.exemple@client.test".into()), ..Default::default() },
+    )
+    .unwrap();
+
+    let text = "Objet : Développeur Rust\nLieu : Lyon\nDurée : 6 mois\nMarie Exemple <Marie.Exemple@client.test>";
+    let draft = needs::draft_from_text(&conn, &me, text).unwrap();
+    assert_eq!(draft.title, "Développeur Rust");
+    assert_eq!(draft.duration_months, Some(6.0));
+    assert_eq!(draft.contact.map(|c| c.id), Some(contact.id));
 }

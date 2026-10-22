@@ -2,7 +2,6 @@
 import { computed, onMounted, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import ActivityPanel from '../components/ActivityPanel.vue'
-import ContractForm from '../components/ContractForm.vue'
 import EmptyState from '../components/EmptyState.vue'
 import HistoryPanel from '../components/HistoryPanel.vue'
 import Icon from '../components/Icon.vue'
@@ -11,7 +10,7 @@ import ResourceForm from '../components/ResourceForm.vue'
 import { ApiError, api } from '../lib/api'
 import { FILE_KIND_LABEL, RESOURCE_KIND_LABEL, fmtDate, fmtMoney, fmtNumber, fmtSize, initials } from '../lib/format'
 import { can, confirmAction, notify, refLabel } from '../lib/store'
-import type { Delivery, HrContract, Positioning, Resource, ResourceFile } from '../lib/types'
+import type { Delivery, Positioning, Resource, ResourceFile } from '../lib/types'
 
 const route = useRoute()
 const router = useRouter()
@@ -19,11 +18,9 @@ const id = Number(route.params.id)
 const resource = ref<Resource | null>(null)
 const positionings = ref<Positioning[]>([])
 const deliveries = ref<Delivery[]>([])
-const contracts = ref<HrContract[]>([])
 const files = ref<ResourceFile[]>([])
 const error = ref('')
 const editing = ref(false)
-const contract = ref<{ c?: HrContract } | null>(null)
 const refresh = ref(0)
 const uploadKind = ref<'cv' | 'skills_file' | 'other'>('cv')
 const uploading = ref(false)
@@ -33,15 +30,13 @@ const showCost = can('costs', 'read')
 async function load() {
   try {
     resource.value = await api.get<Resource>(`/api/resources/${id}`)
-    const [p, d, c, f] = await Promise.all([
+    const [p, d, f] = await Promise.all([
       can('positionings') ? api.get<Positioning[]>('/api/positionings', { resource_id: id }) : Promise.resolve([]),
       can('projects') ? api.get<Delivery[]>('/api/deliveries', { resource_id: id }) : Promise.resolve([]),
-      showCost ? api.get<HrContract[]>(`/api/resources/${id}/contracts`) : Promise.resolve([]),
       api.get<ResourceFile[]>(`/api/resources/${id}/files`),
     ])
     positionings.value = p
     deliveries.value = d
-    contracts.value = c
     files.value = f
     refresh.value++
   } catch (e) {
@@ -72,17 +67,7 @@ async function removeFile(f: ResourceFile) {
   notify('Document supprimé.')
   await load()
 }
-async function removeContract(c: HrContract) {
-  if (!(await confirmAction('Supprimer ce contrat RH ?', 'Le CJM proposé sera recalculé à partir des autres contrats.', 'Supprimer', true))) return
-  await api.del(`/api/contracts/${c.id}`)
-  await load()
-}
 
-async function convert() {
-  resource.value = await api.post<Resource>(`/api/resources/${id}/convert`)
-  notify('Le candidat est devenu consultant.')
-  refresh.value++
-}
 async function archive() {
   const r = resource.value!
   if (!r.archived && !(await confirmAction('Archiver cette fiche ?', 'Elle n’apparaîtra plus dans les listes ni dans les suggestions. Son historique est conservé.', 'Archiver'))) return
@@ -108,14 +93,13 @@ const availability = computed(() => {
   if (r.availability_date && r.availability_date > today) return { text: `Disponible le ${fmtDate(r.availability_date)}`, cls: 'orange' }
   return { text: 'Disponible', cls: 'green' }
 })
-const isCurrent = (c: HrContract) => c.start_date <= today && (!c.end_date || c.end_date >= today)
 </script>
 
 <template>
   <div class="page">
     <p v-if="error" class="alert error" role="alert">{{ error }} <RouterLink to="/resources" class="link">Retour aux ressources</RouterLink></p>
     <template v-if="resource">
-      <nav class="crumbs"><RouterLink to="/resources">Ressources</RouterLink><span>/</span><span>{{ resource.first_name }} {{ resource.last_name }}</span></nav>
+      <nav class="crumbs"><RouterLink to="/resources">Profils</RouterLink><span>/</span><span>{{ resource.first_name }} {{ resource.last_name }}</span></nav>
       <div class="page-head">
         <div class="row" style="gap: 16px">
           <span class="avatar lg">{{ initials(`${resource.first_name} ${resource.last_name}`) }}</span>
@@ -131,7 +115,6 @@ const isCurrent = (c: HrContract) => c.start_date <= today && (!c.end_date || c.
         </div>
         <div class="row wrap">
           <template v-if="can('resources', 'update')">
-            <button v-if="resource.kind === 'candidate'" class="btn primary" type="button" @click="convert"><Icon name="check" /> Devient consultant</button>
             <button class="btn" type="button" @click="editing = true"><Icon name="edit" /> Modifier</button>
             <button class="btn" type="button" @click="archive"><Icon :name="resource.archived ? 'restore' : 'archive'" /> {{ resource.archived ? 'Restaurer' : 'Archiver' }}</button>
           </template>
@@ -151,9 +134,9 @@ const isCurrent = (c: HrContract) => c.start_date <= today && (!c.end_date || c.
               <dt>Expérience</dt><dd>{{ resource.experience_years != null ? fmtNumber(resource.experience_years, 'an(s)') : '—' }}</dd>
               <dt>Disponibilité</dt><dd>{{ resource.availability_date ? fmtDate(resource.availability_date) : 'Immédiate' }}<template v-if="resource.availability_note"> — {{ resource.availability_note }}</template></dd>
               <dt>Type de contrat</dt><dd><RefPill :id="resource.contract_type_id" empty="—" /></dd>
-              <dt v-if="showCost">CJM retenu</dt>
+              <dt v-if="showCost">CJM</dt>
               <dd v-if="showCost">
-                <template v-if="resource.effective_daily_cost != null">{{ fmtMoney(resource.effective_daily_cost) }} <span class="faint small">({{ resource.daily_cost_source === 'contract' ? 'contrat RH en cours' : 'saisi sur la fiche' }})</span></template>
+                <template v-if="resource.daily_cost != null">{{ fmtMoney(resource.daily_cost) }}</template>
                 <span v-else class="faint">Non renseigné — il pourra être complété plus tard, sans bloquer les positionnements.</span>
               </dd>
               <dt>Compétences</dt><dd><div v-if="resource.skills.length" class="tags"><span v-for="s in resource.skills" :key="s" class="tag">{{ s }}</span></div><template v-else>—</template></dd>
@@ -180,26 +163,6 @@ const isCurrent = (c: HrContract) => c.start_date <= today && (!c.end_date || c.
                 <a v-if="f.mime === 'application/pdf'" class="btn small ghost" :href="`/api/files/${f.id}?inline=true`" target="_blank" rel="noopener">Aperçu</a>
                 <button v-if="can('resources', 'update')" class="btn ghost small icon" type="button" aria-label="Supprimer" @click="removeFile(f)"><Icon name="trash" /></button>
               </div>
-            </div>
-          </section>
-
-          <section v-if="showCost" class="card flush">
-            <div class="card-head"><h2>Contrats RH</h2><button v-if="can('costs', 'update')" class="btn small" type="button" @click="contract = {}"><Icon name="plus" /> Contrat</button></div>
-            <EmptyState v-if="!contracts.length" compact title="Aucun contrat RH">Le CJM d'un contrat en cours est proposé automatiquement lors d'un positionnement.</EmptyState>
-            <div v-else class="table-wrap">
-              <table class="table">
-                <tbody>
-                  <tr v-for="c in contracts" :key="c.id">
-                    <td><RefPill :id="c.contract_type_id" empty="Contrat" /> <span v-if="isCurrent(c)" class="pill green plain">En cours</span></td>
-                    <td class="nowrap">{{ fmtDate(c.start_date) }} → {{ c.end_date ? fmtDate(c.end_date) : 'sans fin' }}</td>
-                    <td class="right">{{ fmtMoney(c.daily_cost) }}</td>
-                    <td class="right nowrap" v-if="can('costs', 'update')">
-                      <button class="btn ghost small icon" type="button" aria-label="Modifier" @click="contract = { c }"><Icon name="edit" /></button>
-                      <button class="btn ghost small icon" type="button" aria-label="Supprimer" @click="removeContract(c)"><Icon name="trash" /></button>
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
             </div>
           </section>
 
@@ -235,7 +198,6 @@ const isCurrent = (c: HrContract) => c.start_date <= today && (!c.end_date || c.
       </div>
 
       <ResourceForm v-if="editing" :resource="resource" @close="editing = false" @saved="editing = false; load()" />
-      <ContractForm v-if="contract" :resource-id="id" :contract="contract.c" @close="contract = null" @saved="contract = null; load()" />
     </template>
   </div>
 </template>

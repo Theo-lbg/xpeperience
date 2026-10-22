@@ -24,7 +24,7 @@ const cards = computed(() => {
     { label: 'Sociétés', value: c?.companies, to: '/crm?tab=companies', icon: 'building', area: 'crm' as const },
     { label: 'Contacts', value: c?.contacts, to: '/crm?tab=contacts', icon: 'users', area: 'crm' as const },
     { label: 'Besoins ouverts', value: c?.open_needs, to: '/needs', icon: 'target', area: 'needs' as const },
-    { label: 'Ressources', value: c?.resources, to: '/resources', icon: 'briefcase', area: 'resources' as const, sub: c ? `${c.candidates} candidat(s) · ${c.consultants} consultant(s)` : '' },
+    { label: 'Profils', value: c?.resources, to: '/resources', icon: 'briefcase', area: 'resources' as const, sub: c ? `${c.consultants} en poste · ${c.candidates} à recruter` : '' },
   ].filter((k) => can(k.area))
 })
 

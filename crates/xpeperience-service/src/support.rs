@@ -3,7 +3,7 @@
 use std::collections::HashMap;
 
 use xpeperience_domain::error::Errors;
-use xpeperience_domain::model::{Delivery, EntityKind, FieldChange, HrContract, Named, Positioning, Resource};
+use xpeperience_domain::model::{Delivery, EntityKind, FieldChange, Named, Positioning, Resource};
 use xpeperience_domain::permissions::{Action, Area};
 use xpeperience_domain::refs::{RefItem, RefList};
 use xpeperience_domain::{Id, Result};
@@ -152,8 +152,6 @@ pub(crate) fn can_edit_costs(me: &AuthUser) -> bool {
 pub(crate) fn hide_resource_costs(me: &AuthUser, r: &mut Resource) {
     if !can_see_costs(me) {
         r.daily_cost = None;
-        r.effective_daily_cost = None;
-        r.daily_cost_source = None;
     }
 }
 
@@ -166,12 +164,6 @@ pub(crate) fn hide_positioning_costs(me: &AuthUser, p: &mut Positioning) {
 pub(crate) fn hide_delivery_costs(me: &AuthUser, d: &mut Delivery) {
     if !can_see_costs(me) {
         d.daily_cost = None;
-    }
-}
-
-pub(crate) fn hide_contract_costs(me: &AuthUser, c: &mut HrContract) {
-    if !can_see_costs(me) {
-        c.daily_cost = None;
     }
 }
 

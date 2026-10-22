@@ -31,7 +31,7 @@ let timer: number | undefined
 watch(() => [{ ...filters }, kind.value], () => { clearTimeout(timer); timer = window.setTimeout(load, 200) }, { deep: true })
 onMounted(() => {
   load()
-  if (route.query.new) creating.value = 'candidate'
+  if (route.query.new) creating.value = 'consultant'
 })
 
 const hasFilters = computed(() => !!(filters.q || filters.skill || filters.location || filters.availability || filters.contract_type_id || filters.archived))
@@ -49,17 +49,16 @@ function availability(r: Resource): { text: string; cls: string } {
 <template>
   <div class="page">
     <div class="page-head">
-      <div><h1>Ressources</h1><p class="sub">Vos candidats et vos consultants, avec leurs compétences et leurs disponibilités.</p></div>
+      <div><h1>Profils</h1><p class="sub">Vos profils, en poste ou à recruter, avec leurs compétences et leurs disponibilités.</p></div>
       <div v-if="can('resources', 'create')" class="row">
-        <button class="btn" type="button" @click="creating = 'candidate'"><Icon name="plus" /> Candidat</button>
-        <button class="btn primary" type="button" @click="creating = 'consultant'"><Icon name="plus" /> Consultant</button>
+        <button class="btn primary" type="button" @click="creating = 'consultant'"><Icon name="plus" /> Nouveau profil</button>
       </div>
     </div>
 
     <div class="tabs" role="tablist" style="align-self: flex-start">
       <button type="button" :class="{ on: kind === 'all' }" @click="kind = 'all'">Toutes</button>
-      <button type="button" :class="{ on: kind === 'consultant' }" @click="kind = 'consultant'">Consultants</button>
-      <button type="button" :class="{ on: kind === 'candidate' }" @click="kind = 'candidate'">Candidats</button>
+      <button type="button" :class="{ on: kind === 'consultant' }" @click="kind = 'consultant'">En poste</button>
+      <button type="button" :class="{ on: kind === 'candidate' }" @click="kind = 'candidate'">À recruter</button>
     </div>
 
     <div class="filters">
@@ -76,8 +75,8 @@ function availability(r: Resource): { text: string; cls: string } {
 
     <div v-if="loading && !resources.length" class="card"><div class="stack tight"><div v-for="i in 4" :key="i" class="skeleton" style="height: 30px" /></div></div>
     <EmptyState v-else-if="!resources.length" icon="briefcase" :title="hasFilters ? 'Aucune ressource ne correspond' : 'Aucune ressource pour le moment'">
-      {{ hasFilters ? 'Modifiez ou effacez les filtres.' : 'Ajoutez vos consultants et vos candidats pour pouvoir les positionner sur des besoins.' }}
-      <template v-if="!hasFilters && can('resources', 'create')" #actions><button class="btn primary" type="button" @click="creating = 'consultant'">Ajouter une ressource</button></template>
+      {{ hasFilters ? 'Modifiez ou effacez les filtres.' : 'Ajoutez vos profils pour pouvoir les positionner sur des besoins.' }}
+      <template v-if="!hasFilters && can('resources', 'create')" #actions><button class="btn primary" type="button" @click="creating = 'consultant'">Ajouter un profil</button></template>
     </EmptyState>
     <div v-else class="card flush">
       <div class="table-wrap">
@@ -96,7 +95,7 @@ function availability(r: Resource): { text: string; cls: string } {
               <td>{{ r.location ?? '—' }}</td>
               <td><span class="pill" :class="availability(r).cls">{{ availability(r).text }}</span></td>
               <td><RefPill :id="r.contract_type_id" empty="—" /></td>
-              <td v-if="showCost" class="right">{{ fmtMoney(r.effective_daily_cost) }}</td>
+              <td v-if="showCost" class="right">{{ fmtMoney(r.daily_cost) }}</td>
             </tr>
           </tbody>
         </table>

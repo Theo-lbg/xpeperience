@@ -160,8 +160,6 @@ mod tests {
             availability_note: None,
             contract_type_id: None,
             daily_cost: None,
-            effective_daily_cost: None,
-            daily_cost_source: None,
             notes: None,
             owner: None,
             archived: false,

@@ -20,7 +20,7 @@ const items: { to: string; label: string; icon: string; area?: Area; match: stri
   { to: '/', label: 'Tableau de bord', icon: 'home', match: '/' },
   { to: '/crm', label: 'CRM', icon: 'users', area: 'crm', match: '/crm' },
   { to: '/needs', label: 'Besoins', icon: 'target', area: 'needs', match: '/needs' },
-  { to: '/resources', label: 'Ressources', icon: 'briefcase', area: 'resources', match: '/resources' },
+  { to: '/resources', label: 'Profils', icon: 'briefcase', area: 'resources', match: '/resources' },
   { to: '/projects', label: 'Projets et prestations', icon: 'folder', area: 'projects', match: '/projects' },
   { to: '/settings', label: 'Réglages', icon: 'cog', match: '/settings' },
 ]
