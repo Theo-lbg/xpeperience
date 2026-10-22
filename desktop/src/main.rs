@@ -31,8 +31,10 @@ fn bind_local() -> Result<(TcpListener, u16), String> {
 fn open_externally(url: &str) {
     #[cfg(target_os = "macos")]
     let _ = Command::new("open").arg(url).spawn();
+    // Pas de `cmd /C start` : cmd.exe interprète des caractères comme `&` dans l'adresse et permettrait
+    // d'exécuter une commande. `rundll32` transmet l'adresse telle quelle au navigateur par défaut.
     #[cfg(target_os = "windows")]
-    let _ = Command::new("cmd").args(["/C", "start", "", url]).spawn();
+    let _ = Command::new("rundll32").args(["url.dll,FileProtocolHandler", url]).spawn();
     #[cfg(all(unix, not(target_os = "macos")))]
     let _ = Command::new("xdg-open").arg(url).spawn();
 }

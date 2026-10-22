@@ -41,6 +41,32 @@ jobs:
       - name: Extension LinkedIn (lecteur de profil)
         run: node extension/reader.test.mjs
 
+      - name: Emballage Windows (essai avec un faux exécutable)
+        run: |
+          head -c 200000 /dev/urandom > "$RUNNER_TEMP/fake.exe"
+          node scripts/package-windows.mjs --skip-build --exe "$RUNNER_TEMP/fake.exe"
+          unzip -t dist/XpePerience-*-windows-x64.zip
+
+  # L'application de bureau doit compiler sur chaque système livré (Windows : jamais testé à la main).
+  desktop:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [windows-latest, macos-14]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: web/package-lock.json
+      - run: cd web && npm ci && npm run build
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: Swatinem/rust-cache@v2
+      - name: Compilation de l'application de bureau
+        run: cargo check -p xpeperience-desktop --locked
+
   docker:
     runs-on: ubuntu-latest
     steps:

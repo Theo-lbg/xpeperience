@@ -3,6 +3,7 @@ name: Release
 # Release : déclenchée par une étiquette de version (git tag v0.2.0 && git push origin v0.2.0).
 # Lancement manuel (onglet Actions › Run workflow) : essai à blanc, construit tout, ne publie RIEN
 # (ni image, ni release). À faire avant la première vraie release.
+# Livrables : .dmg macOS (Apple Silicon et Intel), .zip Windows (x64), image Docker, extension, sommes de contrôle.
 on:
   push:
     tags: ['v*']
@@ -52,6 +53,26 @@ jobs:
           path: dist/*.dmg
           if-no-files-found: error
 
+  windows:
+    needs: check-version
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: web/package-lock.json
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: Swatinem/rust-cache@v2
+      - name: Application Windows (.zip)
+        run: node scripts/package-windows.mjs
+      - uses: actions/upload-artifact@v7
+        with:
+          name: zip-windows-x64
+          path: dist/*.zip
+          if-no-files-found: error
+
   docker:
     needs: check-version
     runs-on: ubuntu-latest
@@ -87,7 +108,7 @@ jobs:
           cache-to: type=gha,mode=max
 
   release:
-    needs: [macos, docker]
+    needs: [macos, windows, docker]
     if: github.ref_type == 'tag'
     runs-on: ubuntu-latest
     permissions:
@@ -97,6 +118,11 @@ jobs:
       - uses: actions/download-artifact@v4
         with:
           pattern: dmg-*
+          merge-multiple: true
+          path: release
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: zip-*
           merge-multiple: true
           path: release
       - name: Extension LinkedIn

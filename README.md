@@ -14,6 +14,8 @@ Hors périmètre volontaire : CRA, frais, commandes, facturation, chiffre d'affa
 
 ## Utiliser l'application (utilisateur)
 
+### macOS
+
 1. Ouvrez `XpePerience-….dmg` et glissez **XpePerience** dans *Applications*.
 2. **Première ouverture** : l'application n'est pas signée par un compte développeur Apple. Faites un clic droit sur
    l'icône → **Ouvrir** → **Ouvrir**. Si macOS la bloque encore : *Réglages Système › Confidentialité et sécurité ›
@@ -22,10 +24,22 @@ Hors périmètre volontaire : CRA, frais, commandes, facturation, chiffre d'affa
    `~/Library/Application Support/fr.xpeho.xpeperience/`.
 4. À chaque lancement suivant, l'application s'ouvre directement sur le tableau de bord.
 
+### Windows
+
+1. Téléchargez `XpePerience-…-windows-x64.zip`, faites un clic droit → **Extraire tout**, puis ouvrez le dossier extrait.
+2. Double-cliquez sur **XpePerience.exe**. Au premier lancement, Windows peut afficher « Windows a protégé votre ordinateur »
+   (l'application n'est pas signée par un certificat payant) : cliquez sur **Informations complémentaires**, puis **Exécuter quand même**.
+3. Créez le compte administrateur. Vos données restent sur cet ordinateur, dans `%APPDATA%\fr.xpeho.xpeperience`.
+
+Prérequis : Windows 10 ou 11 à jour (composant WebView2 de Microsoft Edge). Pour désinstaller, supprimez `XpePerience.exe`
+(et le dossier de données si vous voulez aussi effacer vos données).
+
+### Autres informations
+
 **Vous aviez une version portant l'ancien nom (« Boond by XPEHO ») ?** Vos données sont reprises automatiquement depuis l'ancien dossier
 (`fr.xpeho.boond`) : rien à copier ni à ressaisir. Les jetons de l'extension créés avant le renommage continuent de fonctionner.
 
-**Sauvegarde** : copiez le dossier `fr.xpeho.xpeperience` (base `xpeperience.sqlite3`, `documents/`, `branding/`).
+**Sauvegarde** : copiez le dossier de données `fr.xpeho.xpeperience` (base `xpeperience.sqlite3`, `documents/`, `branding/`).
 
 **Logo XPEHO** : le logo fourni est `web/public/logo.png`. Vous pouvez aussi en téléverser un depuis
 *Réglages › Général › Logo XPEHO* sans reconstruire l'application.
@@ -86,13 +100,22 @@ Construire l'application distribuable (macOS) :
 
 Le `.dmg` produit est propre à l'architecture visée (Apple Silicon par défaut ; `TARGET=x86_64-apple-darwin` pour Intel).
 
+Construire l'application Windows (à lancer **sous Windows**, avec Node et Rust installés) :
+
+```bash
+node scripts/package-windows.mjs   # → dist/XpePerience-<version>-windows-x64.zip (XpePerience.exe + LISEZMOI.txt)
+```
+
+Les icônes (macOS, Windows) sont générées par `node scripts/make-icons.mjs`.
+
 ## Publier une version
 
 1. Mettez à jour `version` dans `Cargo.toml` (et `extension/manifest.json` si l'extension change).
 2. `git tag vX.Y.Z && git push origin vX.Y.Z`.
-3. La CI (`.github/workflows/release.yml`) construit les `.dmg` (Apple Silicon et Intel), publie l'image Docker multi-architecture
+3. La CI (`.github/workflows/release.yml`) construit les `.dmg` (Apple Silicon et Intel) et le `.zip` Windows, publie l'image Docker multi-architecture
    sur `ghcr.io/<propriétaire>/<dépôt>`, joint l'extension zippée et les sommes de contrôle (`SHA256SUMS.txt`) à la release GitHub.
 
+L'étiquette peut être précédée d'un essai à blanc (*Actions › Release › Run workflow*), qui construit tout sans rien publier.
 Aucun secret personnalisé n'est nécessaire : la CI utilise uniquement le jeton automatique de GitHub.
 
 Architecture, modèle de données, sécurité : [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md).
