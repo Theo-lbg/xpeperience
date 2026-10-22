@@ -128,13 +128,13 @@ pub fn default_roles() -> Vec<DefaultRole> {
         },
         DefaultRole {
             name: "Commercial",
-            description: "Gère la relation client, les besoins et les positionnements.",
+            description: "Gère la relation client, les besoins, les positionnements et les fiches candidats / consultants.",
             is_admin: false,
             permissions: Permissions::default()
                 .with(Area::Crm, CRUD)
                 .with(Area::Needs, CRUD)
                 .with(Area::Positionings, CRUD)
-                .with(Area::Resources, R)
+                .with(Area::Resources, RCU)
                 .with(Area::Costs, R)
                 .with(Area::Projects, RCU)
                 .with(Area::Settings, R),

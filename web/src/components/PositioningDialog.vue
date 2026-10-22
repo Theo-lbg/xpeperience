@@ -28,6 +28,18 @@ const availability = ref('')
 const showCost = can('costs', 'read')
 
 onMounted(async () => {
+  if (editing && !picked.value) {
+    // Modification : on repart de la ressource déjà positionnée, sans repasser par le choix.
+    const pos = props.positioning!
+    try {
+      picked.value = await api.get<Resource>(`/api/resources/${pos.resource.id}`)
+    } catch {
+      const [first, ...rest] = pos.resource.name.split(' ')
+      picked.value = { id: pos.resource.id, kind: pos.resource_kind, first_name: first, last_name: rest.join(' '), title: pos.resource_title, daily_cost: null } as Resource
+    }
+    loading.value = false
+    return
+  }
   if (editing || picked.value) {
     loading.value = false
     return

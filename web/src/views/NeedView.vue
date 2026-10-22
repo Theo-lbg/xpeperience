@@ -80,6 +80,20 @@ function onSaved(s: PositioningSaved) {
   if (s.suggest_project) converting.value = s.positioning
   load()
 }
+async function changePositioningState(p: Positioning, stateId: number) {
+  if (stateId === p.state_id) return
+  try {
+    const saved = await api.put<PositioningSaved>(`/api/positionings/${p.id}`, {
+      need_id: p.need.id, resource_id: p.resource.id, state_id: stateId, start_date: p.start_date, end_date: p.end_date,
+      daily_rate: p.daily_rate, days: p.days, daily_cost: p.daily_cost, notes: p.notes,
+    })
+    notify('État du positionnement modifié.')
+    onSaved(saved)
+  } catch (e) {
+    notify(e instanceof ApiError ? e.message : 'Modification impossible.', 'error')
+    await load()
+  }
+}
 async function convertForfait() {
   const project = await api.post<{ id: number }>(`/api/needs/${id}/convert`)
   notify('Projet créé à partir du besoin.', 'success', { to: `/projects/${project.id}`, action: 'Ouvrir' })
@@ -161,7 +175,10 @@ const money = (p: Positioning) => (p.daily_rate != null && p.days != null ? fmtM
                   <tr v-for="p in positionings" :key="p.id">
                     <td><RouterLink :to="`/resources/${p.resource.id}`" class="name">{{ p.resource.name }}</RouterLink><div class="sub">{{ RESOURCE_KIND_LABEL[p.resource_kind] }}<template v-if="p.resource_title"> · {{ p.resource_title }}</template></div></td>
                     <td>
-                      <RefPill :id="p.state_id" />
+                      <select v-if="can('positionings', 'update')" class="select" style="min-width: 150px" :value="p.state_id" :aria-label="`État du positionnement de ${p.resource.name}`" @change="changePositioningState(p, Number(($event.target as HTMLSelectElement).value))">
+                        <option v-for="s in refsOf('positioning_state')" :key="s.id" :value="s.id">{{ s.label }}</option>
+                      </select>
+                      <RefPill v-else :id="p.state_id" />
                       <RouterLink v-if="p.project" :to="`/projects/${p.project.id}`" class="small link" style="margin-left: 6px">Projet</RouterLink>
                     </td>
                     <td class="nowrap">{{ p.start_date ? fmtDate(p.start_date) : '—' }} → {{ p.end_date ? fmtDate(p.end_date) : '—' }}</td>
