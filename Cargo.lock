@@ -4833,7 +4833,7 @@ dependencies = [
 
 [[package]]
 name = "xpeperience-desktop"
-version = "0.1.0"
+version = "0.1.1"
 dependencies = [
  "tauri",
  "tauri-build",
@@ -4844,7 +4844,7 @@ dependencies = [
 
 [[package]]
 name = "xpeperience-domain"
-version = "0.1.0"
+version = "0.1.1"
 dependencies = [
  "chrono",
  "serde",
@@ -4854,7 +4854,7 @@ dependencies = [
 
 [[package]]
 name = "xpeperience-http"
-version = "0.1.0"
+version = "0.1.1"
 dependencies = [
  "axum",
  "dirs 5.0.1",
@@ -4875,7 +4875,7 @@ dependencies = [
 
 [[package]]
 name = "xpeperience-server"
-version = "0.1.0"
+version = "0.1.1"
 dependencies = [
  "tokio",
  "tracing-subscriber",
@@ -4885,7 +4885,7 @@ dependencies = [
 
 [[package]]
 name = "xpeperience-service"
-version = "0.1.0"
+version = "0.1.1"
 dependencies = [
  "argon2",
  "base64 0.23.1",
@@ -4901,7 +4901,7 @@ dependencies = [
 
 [[package]]
 name = "xpeperience-store"
-version = "0.1.0"
+version = "0.1.1"
 dependencies = [
  "chrono",
  "rusqlite",
