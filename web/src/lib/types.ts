@@ -59,7 +59,7 @@ export interface Activity {
 export interface Need {
   id: Id; title: string; company: Named | null; contact: Named | null; description: string | null; skills: string[]
   type_id: Id | null; state_id: Id; origin_id: Id | null; budget: number | null; duration_months: number | null
-  planned_days: number | null; start_date: string | null; location: string | null; owner: Named | null
+  planned_days: number | null; start_date: string | null; location: string | null; tender_reference: string | null; owner: Named | null
   project: Named | null; archived: boolean; created_at: string; updated_at: string; positionings_count: number
 }
 export type ResourceKind = 'candidate' | 'consultant'
@@ -112,5 +112,5 @@ export interface DuplicateContact { id: Id; name: string; company: string | null
 
 export interface NeedDraft {
   title: string; description: string; skills: string[]; location: string | null; start_date: string | null
-  duration_months: number | null; planned_days: number | null; emails: string[]; contact: Named | null
+  duration_months: number | null; planned_days: number | null; tender_reference: string | null; emails: string[]; contact: Named | null
 }

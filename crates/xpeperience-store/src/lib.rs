@@ -111,7 +111,7 @@ fn configure(conn: &Connection) -> Result<()> {
     Ok(())
 }
 
-const MIGRATIONS: &[&str] = &[include_str!("schema.sql")];
+const MIGRATIONS: &[&str] = &[include_str!("schema.sql"), include_str!("migrations_002_tender_reference.sql")];
 
 fn migrate(conn: &Connection) -> Result<()> {
     let version: i64 = conn.query_row("PRAGMA user_version", [], |r| r.get(0))?;

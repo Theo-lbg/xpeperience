@@ -344,6 +344,7 @@ pub struct Need {
     pub created_at: String,
     pub updated_at: String,
     pub positionings_count: i64,
+    pub tender_reference: Option<String>,
 }
 
 #[derive(Debug, Clone, Deserialize, Default)]
@@ -362,6 +363,7 @@ pub struct NeedInput {
     pub start_date: Option<String>,
     pub location: Option<String>,
     pub owner_id: Option<Id>,
+    pub tender_reference: Option<String>,
 }
 
 /// Champs proposés à partir d'un texte collé ; rien n'est enregistré.
@@ -374,6 +376,7 @@ pub struct NeedDraft {
     pub start_date: Option<String>,
     pub duration_months: Option<f64>,
     pub planned_days: Option<f64>,
+    pub tender_reference: Option<String>,
     /// Adresses e-mail trouvées dans le texte.
     pub emails: Vec<String>,
     /// Contact existant reconnu à son adresse e-mail.

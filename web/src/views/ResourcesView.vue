@@ -49,7 +49,7 @@ function availability(r: Resource): { text: string; cls: string } {
 <template>
   <div class="page">
     <div class="page-head">
-      <div><h1>Profils</h1><p class="sub">Vos profils, en poste ou à recruter, avec leurs compétences et leurs disponibilités.</p></div>
+      <div><h1>Profils</h1><p class="sub">Vos candidats et vos consultants, avec leurs compétences et leurs disponibilités.</p></div>
       <div v-if="can('resources', 'create')" class="row">
         <button class="btn primary" type="button" @click="creating = 'consultant'"><Icon name="plus" /> Nouveau profil</button>
       </div>
@@ -57,8 +57,8 @@ function availability(r: Resource): { text: string; cls: string } {
 
     <div class="tabs" role="tablist" style="align-self: flex-start">
       <button type="button" :class="{ on: kind === 'all' }" @click="kind = 'all'">Toutes</button>
-      <button type="button" :class="{ on: kind === 'consultant' }" @click="kind = 'consultant'">En poste</button>
-      <button type="button" :class="{ on: kind === 'candidate' }" @click="kind = 'candidate'">À recruter</button>
+      <button type="button" :class="{ on: kind === 'consultant' }" @click="kind = 'consultant'">Consultants</button>
+      <button type="button" :class="{ on: kind === 'candidate' }" @click="kind = 'candidate'">Candidats</button>
     </div>
 
     <div class="filters">

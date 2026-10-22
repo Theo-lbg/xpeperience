@@ -18,7 +18,7 @@ const form = reactive({
   title: n?.title ?? '', contact_id: n?.contact?.id ?? props.contactId ?? (null as number | null), description: n?.description ?? '',
   skills: [...(n?.skills ?? [])], type_id: n?.type_id ?? (refsOf('need_type').length === 1 ? refsOf('need_type')[0].id : null as number | null), state_id: n?.state_id ?? firstRef('need_state', 'open'),
   origin_id: n?.origin_id ?? null as number | null, budget: n?.budget?.toString() ?? '', duration_months: n?.duration_months?.toString() ?? '',
-  planned_days: n?.planned_days?.toString() ?? '', start_date: n?.start_date ?? '', location: n?.location ?? '', owner_id: n?.owner?.id ?? (null as number | null),
+  planned_days: n?.planned_days?.toString() ?? '', start_date: n?.start_date ?? '', location: n?.location ?? '', tender_reference: n?.tender_reference ?? '', owner_id: n?.owner?.id ?? (null as number | null),
 })
 const contacts = ref<Contact[]>([])
 onMounted(async () => {
@@ -39,6 +39,7 @@ async function analyse() {
     if (!form.description) form.description = d.description
     form.skills = [...new Set([...form.skills, ...d.skills])]
     if (!form.location && d.location) form.location = d.location
+    if (!form.tender_reference && d.tender_reference) form.tender_reference = d.tender_reference
     if (!form.start_date && d.start_date) form.start_date = d.start_date
     if (!form.duration_months && d.duration_months != null) form.duration_months = d.duration_months.toString()
     if (!form.planned_days && d.planned_days != null) form.planned_days = d.planned_days.toString()
@@ -61,7 +62,7 @@ async function loadFile(ev: Event) {
 async function save() {
   const body = {
     ...form, description: orNull(form.description), budget: num(form.budget), duration_months: num(form.duration_months),
-    planned_days: num(form.planned_days), start_date: orNull(form.start_date), location: orNull(form.location),
+    planned_days: num(form.planned_days), start_date: orNull(form.start_date), location: orNull(form.location), tender_reference: orNull(form.tender_reference),
   }
   const saved = await submit(() => (n ? api.put<Need>(`/api/needs/${n.id}`, body) : api.post<Need>('/api/needs', body)), Object.keys(form))
   if (saved) {
@@ -109,6 +110,7 @@ async function save() {
       <Field label="Durée (mois)" :required="req('duration_months')" :error="errors.duration_months" for="nm"><input id="nm" v-model="form.duration_months" class="input" inputmode="decimal" /></Field>
       <Field label="Nombre de jours prévus" :required="req('planned_days')" :error="errors.planned_days" for="nj"><input id="nj" v-model="form.planned_days" class="input" inputmode="decimal" /></Field>
       <Field label="Lieu de la mission" for="nl"><input id="nl" v-model="form.location" class="input" placeholder="Ville, télétravail…" /></Field>
+      <Field label="Référence d’appel d’offres" for="nao"><input id="nao" v-model="form.tender_reference" class="input" placeholder="Facultatif" /></Field>
       <Field label="Responsable commercial" :required="req('owner_id')" :error="errors.owner_id" for="nr">
         <select id="nr" v-model="form.owner_id" class="select"><option :value="null">Moi</option><option v-for="u in users" :key="u.id" :value="u.id">{{ u.name }}</option></select>
       </Field>

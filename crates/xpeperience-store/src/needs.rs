@@ -11,7 +11,7 @@ const SELECT: &str = "SELECT n.id, n.title, n.company_id, co.name, n.contact_id,
      n.description, n.skills, n.type_id, n.state_id, n.origin_id, n.budget, n.duration_months, n.planned_days, \
      n.start_date, n.location, n.owner_id, u.first_name || ' ' || u.last_name, n.project_id, p.title, \
      n.archived_at IS NOT NULL, n.created_at, n.updated_at, \
-     (SELECT COUNT(*) FROM positionings x WHERE x.need_id = n.id) \
+     (SELECT COUNT(*) FROM positionings x WHERE x.need_id = n.id), n.tender_reference \
      FROM needs n \
      LEFT JOIN companies co ON co.id = n.company_id \
      LEFT JOIN contacts ct ON ct.id = n.contact_id \
@@ -41,6 +41,7 @@ fn map(r: &Row) -> rusqlite::Result<Need> {
         created_at: r.get(22)?,
         updated_at: r.get(23)?,
         positionings_count: r.get(24)?,
+        tender_reference: r.get(25)?,
     })
 }
 
@@ -48,7 +49,7 @@ pub fn list(conn: &Connection, f: &NeedFilter) -> Result<Vec<Need>> {
     let mut w = Filter::new();
     w.archived("n", f.archived);
     w.search(
-        "n.title || ' ' || COALESCE(n.description, '') || ' ' || n.skills || ' ' || COALESCE(co.name, '') || ' ' || \
+        "n.title || ' ' || COALESCE(n.description, '') || ' ' || n.skills || ' ' || COALESCE(n.tender_reference, '') || ' ' || COALESCE(co.name, '') || ' ' || \
          COALESCE(ct.first_name, '') || ' ' || ct.last_name",
         f.q.as_deref(),
     );
@@ -83,11 +84,11 @@ pub fn insert(conn: &Connection, i: &NeedInput, company_id: Option<Id>, state_id
     let now = now();
     conn.execute(
         "INSERT INTO needs (title, company_id, contact_id, description, skills, type_id, state_id, origin_id, budget, \
-         duration_months, planned_days, start_date, location, owner_id, created_by, created_at, updated_at) \
-         VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10, ?11, ?12, ?13, ?14, ?15, ?16, ?16)",
+         duration_months, planned_days, start_date, location, owner_id, created_by, created_at, updated_at, tender_reference) \
+         VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10, ?11, ?12, ?13, ?14, ?15, ?16, ?16, ?17)",
         params![
             i.title, company_id, i.contact_id, i.description, tags_to_json(&i.skills), i.type_id, state_id, i.origin_id,
-            i.budget, i.duration_months, i.planned_days, i.start_date, i.location, i.owner_id, user_id, now
+            i.budget, i.duration_months, i.planned_days, i.start_date, i.location, i.owner_id, user_id, now, i.tender_reference
         ],
     )?;
     Ok(conn.last_insert_rowid())
@@ -97,10 +98,10 @@ pub fn update(conn: &Connection, id: Id, i: &NeedInput, company_id: Option<Id>, 
     conn.execute(
         "UPDATE needs SET title = ?2, company_id = ?3, contact_id = ?4, description = ?5, skills = ?6, type_id = ?7, \
          state_id = ?8, origin_id = ?9, budget = ?10, duration_months = ?11, planned_days = ?12, start_date = ?13, \
-         location = ?14, owner_id = ?15, updated_at = ?16 WHERE id = ?1",
+         location = ?14, owner_id = ?15, updated_at = ?16, tender_reference = ?17 WHERE id = ?1",
         params![
             id, i.title, company_id, i.contact_id, i.description, tags_to_json(&i.skills), i.type_id, state_id,
-            i.origin_id, i.budget, i.duration_months, i.planned_days, i.start_date, i.location, i.owner_id, now()
+            i.origin_id, i.budget, i.duration_months, i.planned_days, i.start_date, i.location, i.owner_id, now(), i.tender_reference
         ],
     )?;
     Ok(())

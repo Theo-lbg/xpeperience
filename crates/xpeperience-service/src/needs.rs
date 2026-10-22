@@ -54,6 +54,7 @@ fn clean_need(conn: &Connection, refs: &Refs, i: NeedInput) -> Result<(NeedInput
         start_date: clean(i.start_date),
         location: clean(i.location),
         owner_id: i.owner_id,
+        tender_reference: clean(i.tender_reference),
     };
     let mut errors = Errors::new();
     if i.title.is_empty() {
@@ -132,6 +133,7 @@ fn need_diff(refs: &Refs, old: &Need, new: &Need) -> Diff {
     d.num("Jours prévus", old.planned_days, new.planned_days);
     d.text("Démarrage souhaité", old.start_date.as_deref(), new.start_date.as_deref());
     d.text("Lieu", old.location.as_deref(), new.location.as_deref());
+    d.text("Réf. appel d'offres", old.tender_reference.as_deref(), new.tender_reference.as_deref());
     d.named("Responsable commercial", old.owner.as_ref(), new.owner.as_ref());
     d
 }

@@ -137,6 +137,7 @@ const money = (p: Positioning) => (p.daily_rate != null && p.days != null ? fmtM
               <dt>Durée</dt><dd>{{ fmtNumber(need.duration_months, 'mois') }}</dd>
               <dt>Jours prévus</dt><dd>{{ fmtNumber(need.planned_days, 'jours') }}</dd>
               <template v-if="need.budget != null"><dt>Budget éventuel</dt><dd>{{ fmtMoney(need.budget) }}</dd></template>
+              <template v-if="need.tender_reference"><dt>Réf. appel d’offres</dt><dd>{{ need.tender_reference }}</dd></template>
               <dt>Lieu</dt><dd>{{ need.location ?? '—' }}</dd>
               <dt>Responsable commercial</dt><dd>{{ need.owner?.name ?? '—' }}</dd>
               <dt>Compétences</dt><dd><div v-if="need.skills.length" class="tags"><span v-for="s in need.skills" :key="s" class="tag">{{ s }}</span></div><template v-else>—</template></dd>

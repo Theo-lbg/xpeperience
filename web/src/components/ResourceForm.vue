@@ -45,8 +45,8 @@ async function save() {
     <form id="resource-form" class="form-grid" @submit.prevent="save" novalidate>
       <Field class="full" label="Statut" for="rk">
         <div class="tabs" role="radiogroup" style="align-self: flex-start">
-          <button type="button" role="radio" :aria-checked="form.kind === 'candidate'" :class="{ on: form.kind === 'candidate' }" @click="form.kind = 'candidate'">À recruter</button>
-          <button type="button" role="radio" :aria-checked="form.kind === 'consultant'" :class="{ on: form.kind === 'consultant' }" @click="form.kind = 'consultant'">En poste</button>
+          <button type="button" role="radio" :aria-checked="form.kind === 'candidate'" :class="{ on: form.kind === 'candidate' }" @click="form.kind = 'candidate'">Candidat</button>
+          <button type="button" role="radio" :aria-checked="form.kind === 'consultant'" :class="{ on: form.kind === 'consultant' }" @click="form.kind = 'consultant'">Consultant</button>
         </div>
       </Field>
       <Field label="Prénom" required :error="errors.first_name" for="rf"><input id="rf" v-model="form.first_name" class="input" :class="{ invalid: errors.first_name }" autofocus /></Field>

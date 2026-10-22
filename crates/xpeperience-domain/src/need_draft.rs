@@ -50,6 +50,7 @@ const MONTHS: &[(&str, u32)] = &[
 const GREETINGS: &[&str] = &["bonjour", "bonsoir", "hello", "salut", "madame", "monsieur", "cher", "chere", "hi ", "coucou"];
 
 const TITLE_LABELS: &[&str] = &["objet", "subject", "titre", "intitule", "poste", "profil recherche", "profil"];
+const TENDER_LABELS: &[&str] = &["reference ao", "ref ao", "reference appel d'offres", "reference de l'appel d'offres", "appel d'offres"];
 const LOCATION_LABELS: &[&str] = &["lieu", "localisation", "location", "ville", "site"];
 
 fn is_bullet(c: char) -> bool {
@@ -60,7 +61,7 @@ fn is_bullet(c: char) -> bool {
 fn labelled(lines: &[&str], labels: &[&str]) -> Option<String> {
     lines.iter().find_map(|line| {
         let (head, value) = line.split_once(':')?;
-        let head = fold(head);
+        let head = fold(head).replace('.', "");
         let head = head.trim_matches(is_bullet);
         let value = value.trim().trim_matches(|c: char| c == '*' || c == '_').trim();
         (!value.is_empty() && labels.iter().any(|l| head == *l || head.starts_with(&format!("{l} ")))).then(|| value.to_string())
@@ -285,6 +286,7 @@ pub fn extract(text: &str) -> NeedDraft {
         start_date: start_date(&lines),
         duration_months,
         planned_days,
+        tender_reference: labelled(&lines, TENDER_LABELS).map(|v| truncate(&v, 80)),
         emails: emails(&text),
         contact: None,
     }
@@ -294,7 +296,7 @@ pub fn extract(text: &str) -> NeedDraft {
 mod tests {
     use super::*;
 
-    const SAMPLE: &str = "Bonjour,\n\nObjet : TR: Développeur Rust confirmé H/F\n\nVoici notre besoin :\n- Lieu : Lyon (2 jours de télétravail)\n- Démarrage : 1er mars 2027\n- Durée : 6 mois renouvelables\n- Compétences : Rust, Vue.js, PostgreSQL, Docker\n- TJM : 650 € / jour\n\nCordialement,\nMarie Exemple <marie.exemple@client.test>";
+    const SAMPLE: &str = "Bonjour,\n\nObjet : TR: Développeur Rust confirmé H/F\n\nVoici notre besoin :\n- Lieu : Lyon (2 jours de télétravail)\n- Démarrage : 1er mars 2027\n- Durée : 6 mois renouvelables\n- Réf. AO : AO-2027-014\n- Compétences : Rust, Vue.js, PostgreSQL, Docker\n- TJM : 650 € / jour\n\nCordialement,\nMarie Exemple <marie.exemple@client.test>";
 
     #[test]
     fn extracts_labelled_fields() {
@@ -303,6 +305,7 @@ mod tests {
         assert_eq!(d.location.as_deref(), Some("Lyon (2 jours de télétravail)"));
         assert_eq!(d.start_date.as_deref(), Some("2027-03-01"));
         assert_eq!(d.duration_months, Some(6.0));
+        assert_eq!(d.tender_reference.as_deref(), Some("AO-2027-014"));
         assert_eq!(d.skills, ["Rust", "Vue.js", "PostgreSQL", "Docker"]);
         assert_eq!(d.emails, ["marie.exemple@client.test"]);
     }

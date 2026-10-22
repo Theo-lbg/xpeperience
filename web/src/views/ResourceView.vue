@@ -68,6 +68,11 @@ async function removeFile(f: ResourceFile) {
   await load()
 }
 
+async function convert() {
+  resource.value = await api.post<Resource>(`/api/resources/${id}/convert`)
+  notify('Le candidat est devenu consultant.')
+  refresh.value++
+}
 async function archive() {
   const r = resource.value!
   if (!r.archived && !(await confirmAction('Archiver cette fiche ?', 'Elle n’apparaîtra plus dans les listes ni dans les suggestions. Son historique est conservé.', 'Archiver'))) return
@@ -115,6 +120,7 @@ const availability = computed(() => {
         </div>
         <div class="row wrap">
           <template v-if="can('resources', 'update')">
+            <button v-if="resource.kind === 'candidate'" class="btn primary" type="button" @click="convert"><Icon name="check" /> Devient consultant</button>
             <button class="btn" type="button" @click="editing = true"><Icon name="edit" /> Modifier</button>
             <button class="btn" type="button" @click="archive"><Icon :name="resource.archived ? 'restore' : 'archive'" /> {{ resource.archived ? 'Restaurer' : 'Archiver' }}</button>
           </template>
